@@ -172,12 +172,6 @@
     <p>Six thousand trips at 4.97 and none of it is yours — it lives in an app you don't control and disappears the day they deactivate you. Build a profile you own and hand out to anyone.</p>
   </div>
 
-  <div class="card" id="gate" hidden>
-    <h2>Sign in first</h2>
-    <p class="sub">Your profile is tied to your account, so you can edit it from any phone or computer and nobody else can.</p>
-    <a class="go" id="gateLink" href="account.html?next=claim.html" style="display:block;text-align:center;text-decoration:none">Sign in with email</a>
-  </div>
-
   <div class="form" id="form">
     <div class="card">
       <h2>Who you are</h2>
@@ -310,6 +304,16 @@
       </div>
     </div>
 
+    <div class="card" id="emailCard">
+      <h2>Last step: your email</h2>
+      <p class="sub">So you can edit your profile from any phone or computer, and nobody else can. No password, we just email you a link. It's never shown on your profile.</p>
+      <div class="field" style="margin-bottom:0">
+        <label class="fl" for="fEmail">Email</label>
+        <input type="email" id="fEmail" autocomplete="email" inputmode="email" placeholder="you@example.com" style="font:inherit;font-size:15px;padding:10px 12px;width:100%;background:var(--surface);color:var(--text);border:1px solid var(--line);border-radius:var(--radius)">
+      </div>
+    </div>
+    <p class="hint" id="signedAs" hidden style="margin-bottom:12px"></p>
+
     <button class="go" id="submit">Create my profile</button>
     <p class="err" id="err"></p>
   </div>
@@ -318,6 +322,7 @@
     <div class="card">
       <h2 style="font-family:Anton,Impact,sans-serif;text-transform:uppercase;font-size:26px;margin-bottom:10px">Profile is live</h2>
       <p style="color:var(--text-2);margin-bottom:4px">This link is yours. It doesn't expire, and nobody can deactivate it.</p>
+      <p id="checkMail" hidden style="background:var(--surface-2);border:1px solid var(--line-soft);border-radius:var(--radius);padding:12px 14px;margin:12px 0;font-size:14px"></p>
       <div class="linkbox" id="liveLink">&mdash;</div>
       <div class="btnrow">
         <a class="btn pri" id="goProfile" href="#">Open my profile</a>
@@ -355,16 +360,17 @@
   var editHandle = (new URLSearchParams(location.search).get("edit") || "").trim().slice(0,40);
   var editing = null;
   var ready = zilchAuth.attach(sb, secret).then(function(sess){
-    if (!sess){
-      $("form").classList.add("hide");
-      $("gate").hidden = false;
-      $("gateLink").href = zilchAuth.signInUrl();
+    if (sess){
+      $("emailCard").hidden = true;
+      $("signedAs").hidden = false;
+      $("signedAs").textContent = "Saving to your account (" + (sess.user.email || "signed in") + ").";
     }
     return sess;
   });
   if (editHandle){
     (async function(){
-      if (!(await ready)) return;
+      await ready;
+      $("emailCard").hidden = true;
       var own = await sb.rpc("owns_driver", {p_secret: secret, p_handle: editHandle});
       if (own.error || !own.data){ $("err").textContent = "This browser didn't create that profile, so it can't edit it."; return; }
       var res = await sb.from("drivers").select("*").eq("handle", editHandle).limit(1);
@@ -414,6 +420,10 @@
     var e = $("err");
 
     if (!name){ e.textContent = "First name is needed — it's what people remember."; return; }
+    var email = $("fEmail").value.trim();
+    if (!editing && !zilchAuth.session && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){
+      e.textContent = "Add your email at the bottom so you can get back into your profile."; $("fEmail").focus(); return;
+    }
     if (!service){ e.textContent = "Pick whether you do rides, delivery or both."; return; }
     if (!area){ e.textContent = $("fArea").value === "other" ? "Type the city or neighborhood you drive in." : "Pick your main area."; return; }
     if (!vehicle){ e.textContent = "Add your vehicle so people can spot you."; return; }
@@ -461,6 +471,18 @@
     }
 
     if (editing){ location.href = "d.html?h=" + encodeURIComponent(handle); return; }
+
+    // Not signed in yet: tie the profile to their email and send the sign-in link.
+    // It's matched by email, so opening the link in any browser still claims it.
+    if (!zilchAuth.session && email){
+      await sb.rpc("remember_email", {p_secret: secret, p_email: email});
+      var base = location.origin + location.pathname.replace(/claim\.html$/, "");
+      var sent = await sb.auth.signInWithOtp({email: email, options: {emailRedirectTo: base + "d.html?h=" + encodeURIComponent(handle)}});
+      $("checkMail").hidden = false;
+      $("checkMail").textContent = sent.error
+        ? "We couldn't send the email just now. Sign in later from the Sign in page with " + email + " and your profile will be there."
+        : "One more tap: we emailed a link to " + email + ". Open it to lock this profile to your account.";
+    }
 
     // A new driver profile also counts as a driver pledge for their area,
     // unless this browser already pledged on the pledge page.

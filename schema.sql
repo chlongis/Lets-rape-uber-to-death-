@@ -193,20 +193,55 @@ begin
   return zilch_hash(p_secret);
 end $$;
 
--- First sign-in on a browser: move everything that browser owns to the account.
-create or replace function link_browser(p_secret text) returns integer
-language plpgsql security definer set search_path = public, auth as $$
-declare v_old text; v_new text; n integer := 0; c integer;
+-- Profiles made before signing in remember the email typed on the form, so a
+-- sign-in from ANY browser (say, the email app's) can still claim them.
+create table if not exists pending_links (
+  owner_hash text not null,
+  email text not null,
+  created_at timestamptz default now(),
+  primary key (owner_hash, email)
+);
+alter table pending_links enable row level security;
+
+create or replace function zilch_move_owner(v_old text, v_new text) returns integer
+language plpgsql security definer set search_path = public as $$
+declare n integer := 0; c integer;
 begin
-  if auth.uid() is null then raise exception 'sign in first'; end if;
-  if p_secret is null or length(p_secret) < 32 or p_secret like 'user:%' then return 0; end if;
-  v_old := zilch_hash(p_secret);
-  v_new := zilch_hash('user:' || auth.uid()::text);
+  if v_old is null or v_old = v_new then return 0; end if;
   update driver_owners   set owner_hash   = v_new where owner_hash   = v_old; get diagnostics c = row_count; n := n + c;
   update request_private set poster_hash  = v_new where poster_hash  = v_old; get diagnostics c = row_count; n := n + c;
   update request_private set claimer_hash = v_new where claimer_hash = v_old; get diagnostics c = row_count; n := n + c;
   if not exists (select 1 from payout_accounts where owner_hash = v_new) then
     update payout_accounts set owner_hash = v_new where owner_hash = v_old; get diagnostics c = row_count; n := n + c;
+  end if;
+  return n;
+end $$;
+
+-- Before sign-in: note which email this browser's things should go to.
+create or replace function remember_email(p_secret text, p_email text) returns void
+language plpgsql security definer set search_path = public, auth as $$
+begin
+  if auth.uid() is not null then return; end if;
+  if p_email !~ '^[^@\s]+@[^@\s]+\.[^@\s]+$' or length(p_email) > 200 then raise exception 'bad email'; end if;
+  insert into pending_links (owner_hash, email) values (zilch_me(p_secret), lower(trim(p_email)))
+  on conflict do nothing;
+end $$;
+
+-- On sign-in: move this browser's things, and anything waiting for this email, onto the account.
+create or replace function link_browser(p_secret text) returns integer
+language plpgsql security definer set search_path = public, auth as $$
+declare v_new text; n integer := 0; r record; v_email text;
+begin
+  if auth.uid() is null then raise exception 'sign in first'; end if;
+  v_new := zilch_hash('user:' || auth.uid()::text);
+  if p_secret is not null and length(p_secret) >= 32 and p_secret not like 'user:%' then
+    n := n + zilch_move_owner(zilch_hash(p_secret), v_new);
+  end if;
+  v_email := lower(auth.jwt() ->> 'email');
+  if v_email is not null then
+    for r in delete from pending_links where email = v_email returning owner_hash loop
+      n := n + zilch_move_owner(r.owner_hash, v_new);
+    end loop;
   end if;
   return n;
 end $$;
@@ -542,6 +577,7 @@ grant execute on function my_jobs(text), send_message(text, uuid, text),
   get_messages(text, uuid, bigint), my_payout(text) to anon, authenticated;
 revoke all on function zilch_role(text, uuid) from anon, authenticated;
 revoke all on function link_browser(text) from public, anon;
+revoke all on function zilch_move_owner(text, text) from public, anon, authenticated;
 grant execute on function link_browser(text) to authenticated;
 
 do $$

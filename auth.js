@@ -1,7 +1,7 @@
 // Zilch accounts (Supabase email-link sign-in).
 // Pages that talk to the database call zilchAuth.attach(sb, secret) once.
-// The first time a signed-in person opens Zilch in a browser, everything that
-// browser's key owns (profiles, jobs, chats, payouts) moves onto the account.
+// When a signed-in person opens Zilch, everything this browser's key owns, and
+// anything made before sign-in with their email, moves onto the account.
 (function(){
   "use strict";
   var api = {
@@ -10,15 +10,9 @@
       var res = await sb.auth.getSession();
       api.session = res.data ? res.data.session : null;
       paintNav();
-      if (api.session && secret){
-        var key = "zilch.linked." + api.session.user.id;
-        var done = null;
-        try { done = localStorage.getItem(key); } catch(e){}
-        if (!done){
-          var r = await sb.rpc("link_browser", {p_secret: secret});
-          if (!r.error){ try { localStorage.setItem(key, "1"); } catch(e){} }
-        }
-      }
+      // Cheap and idempotent: claims this browser's things and anything that was
+      // made elsewhere with this account's email.
+      if (api.session) await sb.rpc("link_browser", {p_secret: secret || ""});
       sb.auth.onAuthStateChange(function(_evt, s){ api.session = s; paintNav(); });
       return api.session;
     },

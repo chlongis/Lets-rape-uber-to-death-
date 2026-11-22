@@ -61,7 +61,7 @@ The site is a progressive web app. On Android, Chrome offers an **Install** butt
 
 ## Accounts
 
-Sign-in is by email link (Supabase Auth, no passwords) on `account.html`. Creating a driver profile and setting up payouts need an account; browsing, the tools and the job board work without one.
+Sign-in is by email link (Supabase Auth, no passwords) on `account.html`. The profile form asks for an email as its last field, not up front: the profile goes live right away, the email is saved with it (`remember_email`), and a sign-in link is sent. Opening that link in any browser claims the profile, because pending links are matched by email, not by browser. Setting up payouts needs an account; browsing, the tools and the job board work without one.
 
 Ownership is checked by `zilch_me()` in `schema.sql`: a signed-in person's account, otherwise the browser key. The first time someone signs in on a browser, `link_browser()` moves everything that browser's key owned onto the account. The payments function reads the account from the request's login token.
 
