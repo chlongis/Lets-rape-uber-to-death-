@@ -174,7 +174,7 @@
   <div class="form" id="form">
     <div class="card">
       <h2>Who you are</h2>
-      <p class="sub">First name only. Riders recognize a face and a car, not a last name.</p>
+      <p class="sub">First name only. Riders and customers recognize a face and a car, not a last name.</p>
 
       <div class="two">
         <div class="field">
@@ -202,7 +202,7 @@
 
       <div class="field">
         <label class="fl" for="fVehicle">Vehicle</label>
-        <p class="hint">What riders look for at the curb.</p>
+        <p class="hint">What riders and customers look for at the curb or the door.</p>
         <input type="text" id="fVehicle" maxlength="50" placeholder="Gray Toyota RAV4" autocomplete="off">
       </div>
 
@@ -215,11 +215,11 @@
 
     <div class="card">
       <h2>Your record</h2>
-      <p class="sub">Pull these from your driver app. Numbers you can't back up will get flagged by riders, so keep them straight.</p>
+      <p class="sub">Pull these from your driver app. Numbers you can't back up will get flagged, so keep them straight.</p>
 
       <div class="two">
         <div class="field">
-          <label class="fl" for="fTrips">Completed trips</label>
+          <label class="fl" for="fTrips">Completed trips or deliveries</label>
           <input type="number" id="fTrips" min="0" step="1" placeholder="6042">
         </div>
         <div class="field">
@@ -237,9 +237,20 @@
           <label class="fl" for="fPlatform">Where you drive</label>
           <select id="fPlatform">
             <option value="">Pick one</option>
-            <option>Uber</option>
-            <option>Lyft</option>
-            <option>Uber and Lyft</option>
+            <optgroup label="Rideshare">
+              <option>Uber</option>
+              <option>Lyft</option>
+              <option>Uber and Lyft</option>
+            </optgroup>
+            <optgroup label="Delivery">
+              <option>DoorDash</option>
+              <option>Uber Eats</option>
+              <option>Grubhub</option>
+              <option>Instacart</option>
+              <option>Spark</option>
+              <option>More than one delivery app</option>
+            </optgroup>
+            <option>Rideshare and delivery</option>
             <option>Other</option>
           </select>
         </div>
@@ -248,7 +259,7 @@
 
     <div class="card">
       <h2>Proof</h2>
-      <p class="sub">A screenshot of your stats screen. Riders see whether a profile is backed by anything.</p>
+      <p class="sub">A screenshot of your stats screen. People see whether a profile is backed by anything.</p>
 
       <div class="upload" id="uz">
         <input type="file" id="fProof" accept="image/*,.pdf">
@@ -262,7 +273,7 @@
     </div>
 
     <div class="card">
-      <h2>How riders reach you</h2>
+      <h2>How people reach you</h2>
       <p class="sub">Shown on your profile. Use a number you're fine giving out — a Google Voice line works well.</p>
 
       <div class="two">
@@ -375,12 +386,12 @@
     var cval    = $("fCVal").value.trim().slice(0,60);
     var e = $("err");
 
-    if (!name){ e.textContent = "First name is needed — it's what riders remember."; return; }
+    if (!name){ e.textContent = "First name is needed — it's what people remember."; return; }
     if (!area){ e.textContent = $("fArea").value === "other" ? "Type the city or neighborhood you drive in." : "Pick your main area."; return; }
-    if (!vehicle){ e.textContent = "Add your vehicle so riders can spot you."; return; }
+    if (!vehicle){ e.textContent = "Add your vehicle so people can spot you."; return; }
     if (isNaN(trips) || trips < 0){ e.textContent = "Trip count is needed."; return; }
     if (isNaN(rating) || rating < 1 || rating > 5){ e.textContent = "Rating should be between 1 and 5."; return; }
-    if (!cval){ e.textContent = "Riders need some way to reach you."; return; }
+    if (!cval){ e.textContent = "People need some way to reach you."; return; }
     e.textContent = "";
 
     var btn = $("submit");
