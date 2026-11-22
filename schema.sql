@@ -122,6 +122,7 @@ end $$;
 
 -- Old ownership keys were public, so they can't be trusted and aren't migrated.
 -- Profiles made before this change have no owner; delete or reassign them in the dashboard.
+alter table requests add column if not exists area text;   -- very old tables were made before this column existed
 alter table requests drop column if exists contact;
 alter table requests drop column if exists claimed_by;
 alter table requests drop column if exists posted_by;
@@ -168,7 +169,7 @@ create policy "add deactivations"  on deactivations for insert with check (true)
 -- Functions
 -- ---------------------------------------------------------------
 create or replace function zilch_hash(p_secret text) returns text
-language plpgsql immutable as $$
+language plpgsql immutable set search_path = pg_catalog, public as $$
 begin
   if p_secret is null or length(p_secret) < 32 then
     raise exception 'bad secret';
@@ -503,6 +504,7 @@ revoke all on function zilch_role(text, uuid), my_jobs(text), send_message(text,
   get_messages(text, uuid, bigint), my_payout(text) from public;
 grant execute on function my_jobs(text), send_message(text, uuid, text),
   get_messages(text, uuid, bigint), my_payout(text) to anon, authenticated;
+revoke all on function zilch_role(text, uuid) from anon, authenticated;
 
 do $$
 declare f text;
@@ -533,7 +535,7 @@ begin
 end $$;
 
 -- ---------------------------------------------------------------
--- Storage buckets — create these in the dashboard first:
+-- Storage buckets (created below if missing):
 --   proof      : driver stats screenshots
 --   insurance  : optional insurance uploads from the board
 -- Both private, 5 MB cap, image/jpeg + image/png + application/pdf.
@@ -542,6 +544,11 @@ end $$;
 -- key can list or download these files. You can still view them in the
 -- Supabase dashboard, which uses the service role.
 -- ---------------------------------------------------------------
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values ('proof', 'proof', false, 5242880, array['image/jpeg','image/png','application/pdf']),
+       ('insurance', 'insurance', false, 5242880, array['image/jpeg','image/png','application/pdf'])
+on conflict (id) do nothing;
+
 drop policy if exists "upload proof"     on storage.objects;
 drop policy if exists "read proof"       on storage.objects;
 drop policy if exists "upload insurance" on storage.objects;
