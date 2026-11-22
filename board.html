@@ -410,7 +410,7 @@
 
       <div>
         <label class="fl" for="fContact">How should the driver reach you?</label>
-        <p class="note" style="margin-bottom:6px">Phone, Signal, anything — only shown to whoever claims. Optional.</p>
+        <p class="note" style="margin-bottom:6px">Phone, Signal, whatever. Only the driver who claims it sees this. Optional.</p>
         <input type="text" id="fContact" maxlength="80" placeholder="612-555-0100 or @you on Signal">
       </div>
 
@@ -465,7 +465,7 @@
 <div class="overlay" id="insuranceGate" hidden>
   <div class="gate">
     <h2>One thing before you drive</h2>
-    <p>Upload your rideshare insurance card so riders know you're covered. Photo, screenshot, PDF — whatever you've got.</p>
+    <p>Upload your rideshare insurance card so riders know you're covered. Photo, screenshot, PDF, whatever you've got.</p>
     <div class="upload-zone" id="uploadZone">
       <input type="file" id="insuranceFile" accept="image/*,.pdf">
       <div class="uz-label" id="uzLabel">Tap or drop your insurance card here</div>
@@ -709,7 +709,7 @@
     var path = secret.slice(0,8) + "-" + Date.now().toString(36) + "." + ext;
     var res = await sb.storage.from("insurance").upload(path, selectedFile, {upsert:false});
     if (res.error){
-      $("gateMsg").textContent = "Upload failed — you can still proceed without it.";
+      $("gateMsg").textContent = "Upload failed. You can still keep going without it.";
       btn.disabled = false; btn.textContent = "Try again";
       return;
     }

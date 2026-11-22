@@ -259,17 +259,17 @@
             <option value="mn27">Jan 2027 onward</option>
           </optgroup>
           <optgroup label="Washington">
-            <option value="seattle">Seattle &mdash; 2026</option>
-            <option value="wa">Outside Seattle &mdash; 2026</option>
+            <option value="seattle">Seattle, 2026</option>
+            <option value="wa">Outside Seattle, 2026</option>
           </optgroup>
           <optgroup label="New York City">
-            <option value="nyc">Standard vehicle &mdash; 2026</option>
-            <option value="nycwav">Wheelchair-accessible &mdash; 2026</option>
+            <option value="nyc">Standard vehicle, 2026</option>
+            <option value="nycwav">Wheelchair-accessible, 2026</option>
           </optgroup>
           <optgroup label="Food and grocery delivery">
             <option value="mndel">Minnesota (DoorDash, Uber Eats, etc.)</option>
-            <option value="seadel">Seattle &mdash; 2026</option>
-            <option value="nycdel">New York City &mdash; from Apr 2026</option>
+            <option value="seadel">Seattle, 2026</option>
+            <option value="nycdel">New York City, from Apr 2026</option>
           </optgroup>
         </select>
       </div>
@@ -345,7 +345,7 @@
   <div class="sec-head">
     <span class="eyebrow">While you're here</span>
     <h2>That record is yours. Take it with you.</h2>
-    <p>Those trips and that rating live in an app you don't control and vanish the day they deactivate you. Build a profile that doesn't — riders can find you directly, and you keep the whole fare.</p>
+    <p>Those trips and that rating live in an app you don't control and vanish the day they deactivate you. Build a profile that doesn't. Riders find you directly, and you keep the whole fare.</p>
   </div>
   <a class="act" href="claim.html" style="text-decoration:none;display:inline-block">Claim your profile &rarr;</a>
 </section>
@@ -404,7 +404,7 @@
   </section>
 
 <footer class="wrap">
-  <p><strong>This is an estimate, not a legal determination.</strong> The per-trip floor applies to each trip individually, and this can only approximate that from your totals — so the real minimum may be higher if many of your trips were short. In Washington and New York City the whole standard is per trip, which makes this a rougher guide there. A shortfall here means go look at your statements, not that it's proven.</p>
+  <p><strong>This is an estimate, not a legal determination.</strong> The per-trip floor applies to each trip individually, and this can only approximate that from your totals, so the real minimum may be higher if many of your trips were short. In Washington and New York City the whole standard is per trip, which makes this a rougher guide there. A shortfall here means go look at your statements, not that it's proven.</p>
   <p>Rates from Minn. Stat. § 181C.03 (Minnesota DLI), RCW 49.46.300 (Washington L&amp;I), and 35 RCNY § 59B-23 (NYC TLC, effective March 1 2026). Not affiliated with any agency, Uber, Lyft or anyone else. Not legal advice.</p>
 </footer>
 
@@ -563,7 +563,7 @@
       $("vhead").textContent = "You were paid at or above the minimum";
       var olds = document.querySelectorAll("#verdict .vamount");
       Array.prototype.forEach.call(olds, function(n){ n.remove(); });
-      $("vsub").textContent = "Cleared it by " + usd(diff) + ". " + (r.basis === "period" ? "Check a few more periods — each one counts separately." : "Individual short trips can still be violations here — this is the total.");
+      $("vsub").textContent = "Cleared it by " + usd(diff) + ". " + (r.basis === "period" ? "Check a few more periods. Each one counts separately." : "Individual short trips can still be violations here — this is the total.");
       $("shortSec").hidden = true;
     }
 
@@ -573,7 +573,7 @@
     var kept = riderPaid - paid;
     $("cutAmt").textContent = usd(kept);
     $("cutExp").textContent = "At a " + Math.round(t*100) + "% take rate, your " + (r.kind === "delivery" ? "customers" : "riders") + " paid about " +
-      usd(riderPaid) + " this period and " + usd(kept) + " of it never reached you. Legal, unlike a shortfall above — just expensive.";
+      usd(riderPaid) + " this period and " + usd(kept) + " of it never reached you. That part's legal. Just expensive as hell.";
     $("cutBlock").hidden = false;
 
     lastCalc = {

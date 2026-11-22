@@ -139,7 +139,7 @@
     font-size:clamp(44px,8.8vw,108px);
     line-height:.93;
     letter-spacing:.005em;
-    margin-top:18px;
+    margin-top:0;
   }
   .hero h1 .strike{position:relative;white-space:nowrap}
   .hero h1 .strike::after{
@@ -175,7 +175,7 @@
   .sec-head{margin-bottom:34px}
   .sec-head h2{
     font-family:Anton,Impact,sans-serif;text-transform:uppercase;
-    font-size:clamp(28px,4.2vw,44px);line-height:1;margin-top:10px;
+    font-size:clamp(28px,4.2vw,44px);line-height:1;margin-top:0;
   }
   .sec-head p{margin-top:14px;max-width:62ch;color:var(--text-2)}
 
@@ -187,8 +187,7 @@
     padding:26px 24px;display:flex;flex-direction:column;gap:10px;
   }
   .step .n{
-    font-family:"IBM Plex Mono",ui-monospace,monospace;
-    font-size:11px;letter-spacing:.16em;font-weight:600;color:var(--accent-ink);
+    font-family:Anton,Impact,sans-serif;font-size:44px;line-height:.9;color:var(--accent-ink);
   }
   .step h3{font-size:20px;font-weight:600;line-height:1.25}
   .step p{color:var(--text-2);font-size:15px;line-height:1.55}
@@ -239,7 +238,7 @@
 
   /* chooser */
   .pick{padding-block:34px 44px;border-bottom:1px solid var(--line)}
-  .pick h2{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.16em;text-transform:uppercase;font-weight:600;color:var(--text-3);margin-bottom:14px}
+  .pick h2{font-family:Anton,Impact,sans-serif;text-transform:uppercase;font-size:clamp(26px,3.6vw,36px);line-height:1;margin-bottom:18px}
   .picks{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
   @media (max-width:900px){ .picks{grid-template-columns:1fr 1fr} }
   @media (max-width:520px){ .picks{grid-template-columns:1fr} }
@@ -282,9 +281,8 @@
 
 <main>
   <div class="hero wrap">
-    <span class="eyebrow">Portable driver reputation</span>
     <h1>Work for yourself,<br> <em>for real this time</em>.</h1>
-    <p class="hero-sub">Your rating is the most valuable thing you own and you can't take it anywhere. It sits inside an app you don't control and it's gone the morning they deactivate you. <strong>Build a record that's actually yours. Cut out the middleman.</strong></p>
+    <p class="hero-sub">Your rating is the most valuable thing you've got and you can't take it anywhere. It lives inside their app, and it's gone the day they deactivate you. <strong>Build one that's actually yours. Cut out the middleman.</strong></p>
     <div class="herocta">
       <a class="btn" href="claim.html">Claim your profile</a>
       <a class="btn ghost" href="find.html">Find a driver</a>
@@ -297,25 +295,25 @@
       <a class="pk" href="offer.html">
         <span class="who">On shift right now</span>
         <span class="what">Is this offer worth it?</span>
-        <span class="why">Screenshot it or punch it in. See what it really pays per hour after gas.</span>
+        <span class="why">Screenshot it. Find out what it actually pays after gas before the timer runs out.</span>
         <span class="go">Check an offer &rarr;</span>
       </a>
       <a class="pk" href="worst.html">
         <span class="who">Just got lowballed</span>
         <span class="what">Post your worst offer</span>
-        <span class="why">Ranked by what it really pays after gas. The worst one of the week gets posted every Monday.</span>
+        <span class="why">Put it on the wall of shame. The worst one each week gets posted every Monday.</span>
         <span class="go">See the board &rarr;</span>
       </a>
       <a class="pk" href="claim.html">
         <span class="who">I drive or deliver</span>
         <span class="what">Get booked directly</span>
-        <span class="why">Your own profile and link. Customers reach you, you set the price, you keep all of it.</span>
+        <span class="why">Your own page and link. People book you, you name the price, nobody skims off the top.</span>
         <span class="go">Claim your profile &rarr;</span>
       </a>
       <a class="pk alt" href="board.html">
         <span class="who">I need a ride or delivery</span>
-        <span class="what">Skip the app's cut</span>
-        <span class="why">Post what you need and your price. A local driver claims it and keeps 100% of it.</span>
+        <span class="what">Skip the middleman</span>
+        <span class="why">Post what you need and what you'll pay. A local driver grabs it and keeps every dollar.</span>
         <span class="go">Post a job &rarr;</span>
       </a>
     </div>
@@ -323,50 +321,48 @@
 
   <section class="wrap">
     <div class="sec-head">
-      <span class="eyebrow">How it works</span>
-      <h2>Three steps, then you own it</h2>
+      <h2>How it works</h2>
     </div>
     <div class="steps">
       <div class="step">
-        <span class="n">STEP 01</span>
-        <h3>Build it once</h3>
-        <p>Your trips and deliveries, your rating, your car, your area. Attach a screenshot of your stats screen and the profile shows as verified. Takes about two minutes.</p>
+        <span class="n">1</span>
+        <h3>Make your page</h3>
+        <p>Rating, trips, car, area. Takes two minutes. Throw in a screenshot of your stats screen and it shows as verified.</p>
       </div>
       <div class="step">
-        <span class="n">STEP 02</span>
-        <h3>Hand it out</h3>
-        <p>A permanent link, a QR code for the seatback, a printable card, or save straight into a rider's or customer's contacts. However you want to give it out, it's there.</p>
+        <span class="n">2</span>
+        <h3>Give it out</h3>
+        <p>A link, a QR code for the back of the seat, a card you hand out, or straight into someone's contacts. Whatever works.</p>
       </div>
       <div class="step">
-        <span class="n">STEP 03</span>
-        <h3>Get found directly</h3>
-        <p>Riders and customers look you up and reach you themselves. You set the price, you keep all of it, and nobody takes a percentage for making the introduction.</p>
+        <span class="n">3</span>
+        <h3>Keep the money</h3>
+        <p>People reach you directly. You set the price and you keep all of it. Nobody takes a cut for an introduction they didn't make.</p>
       </div>
     </div>
   </section>
 
   <section class="wrap">
     <div class="sec-head">
-      <span class="eyebrow">Why this matters</span>
-      <h2>Your reputation is the product they're selling</h2>
-      <p>Uber's and DoorDash's fee isn't payment for an app. It's payment for being the only one who knows you're good at this.</p>
+      <h2>Your rating is their leash</h2>
+      <p>The fee they take is for being the only ones who know you're good at this.</p>
     </div>
     <div class="facts">
       <div class="fact">
         <h3>It doesn't transfer</h3>
-        <p>Four years of five-star ratings is worth nothing the moment you open a different app. That isn't a technical limitation — it's the entire retention strategy.</p>
+        <p>Four years of five stars means jack shit the second you open a different app. That's on purpose. It keeps you stuck.</p>
       </div>
       <div class="fact alt">
-        <h3>It vanishes on deactivation</h3>
-        <p>An algorithm decides, there's often no appeal, and everything you built is gone with it. A record you hold a copy of can't be switched off.</p>
+        <h3>One switch and it's gone</h3>
+        <p>An algorithm decides, there's often no real appeal, and everything you built goes with it. A record you own can't get switched off.</p>
       </div>
       <div class="fact">
-        <h3>It costs you 30% forever</h3>
-        <p>As long as they're the only place your history exists, the cut is whatever they say it is. A rider or customer who can find you directly changes that number to zero.</p>
+        <h3>So they set the cut</h3>
+        <p>As long as your history only exists in their app, they take whatever cut they feel like. A customer who can find you directly takes that to zero.</p>
       </div>
       <div class="fact alt">
-        <h3>Customers pay the price too</h3>
-        <p>Literally. Delivery fees have gotten crazy high over the years, customers pay more every year, and drivers don't see any of it.</p>
+        <h3>Customers get screwed too</h3>
+        <p>Delivery fees keep climbing every year and drivers aren't the ones seeing that money.</p>
       </div>
     </div>
   </section>
@@ -374,8 +370,8 @@
   <section class="wrap">
     <div class="paystrip">
       <div>
-        <h3>On shift right now? Check the offer first.</h3>
-        <p>The app shows the payout, not what the trip costs your car or the empty miles back. Punch in the offer and get Take it, Maybe or Skip, based on your own car and your own floor, before the timer runs out.</p>
+        <h3>On shift? Check it before you hit accept.</h3>
+        <p>The app shows you the payout. It doesn't show you the gas, the wear on your car, or the empty miles home. Screenshot the offer or punch it in and get Take it, Maybe or Skip, based on your car and your floor.</p>
       </div>
       <a class="btn" href="offer.html">Check an offer</a>
     </div>
@@ -384,12 +380,12 @@
   <section class="wrap">
     <div class="paystrip">
       <div>
-        <h3>While you're here — were you paid legally?</h3>
-        <p>Minnesota sets a floor on rideshare pay. Seattle and New York City also set one for food delivery. Run one pay period against it and find out whether you were short, and who to file with if you were.</p>
+        <h3>Did they even pay you legally?</h3>
+        <p>Minnesota has a pay floor for rideshare. Seattle and New York City have one for delivery. Minnesota delivery drivers don't have one at all. Run a pay period through it and see if you got shorted, and who to file with if you did.</p>
         <div class="rates">
           <div><div class="v">$1.28</div><div class="k">per mile</div></div>
           <div><div class="v">$0.31</div><div class="k">per minute</div></div>
-          <div><div class="v">$5.00</div><div class="k">per trip floor</div></div>
+          <div><div class="v">$5.00</div><div class="k">per trip, minimum</div></div>
         </div>
       </div>
       <a class="btn" href="paycheck.html">Check a pay period</a>
@@ -398,33 +394,32 @@
 
   <section class="wrap">
     <div class="sec-head">
-      <span class="eyebrow">Also here</span>
       <h2>More tools, all free</h2>
     </div>
     <div class="ctarow">
       <a class="ctacard" href="board.html">
         <span class="ctak">The job board</span>
-        <span class="ctad">Someone needs a ride or a delivery, names a price, and a driver claims it. No commission, no surge split — the offer goes to whoever does the work.</span>
+        <span class="ctad">Someone needs a ride or a delivery, names a price, and a driver claims it. No commission, no surge games. The money goes to whoever does the work.</span>
         <span class="ctago">Open the board &rarr;</span>
       </a>
       <a class="ctacard alt" href="pledge.html">
         <span class="ctak">Pledge your area</span>
-        <span class="ctad">Say where you'd drive. Nothing turns on in a suburb until enough drivers there commit, so the first night is never four people and an empty map.</span>
+        <span class="ctad">Say where you'd drive. Nothing launches in a suburb until enough drivers sign up, so nobody shows up to a dead map.</span>
         <span class="ctago">Add your name &rarr;</span>
       </a>
       <a class="ctacard alt" href="worst.html">
         <span class="ctak">Worst offer of the week</span>
-        <span class="ctad">Got a lowball offer? Screenshot it and submit it. Every entry is ranked by what it really pays per hour after gas, and the worst one each week gets posted.</span>
+        <span class="ctad">Got lowballed? Screenshot it and submit it. Everything's ranked by what it really pays per hour after gas.</span>
         <span class="ctago">See this week's worst &rarr;</span>
       </a>
       <a class="ctacard" href="receipt.html">
         <span class="ctak">Where the money went</span>
-        <span class="ctad">Put in what the customer paid, what the food costs at the counter, and what the driver got. Get a card that shows what the app kept, ready to post.</span>
+        <span class="ctad">What the customer paid, what the food costs at the counter, what the driver got. Get a card showing what the app kept, ready to post.</span>
         <span class="ctago">Make a receipt card &rarr;</span>
       </a>
       <a class="ctacard alt" href="deact.html">
         <span class="ctak">Deactivation tracker</span>
-        <span class="ctad">Switched off with no reason? Report it anonymously in 30 seconds and see how many other drivers got the same treatment.</span>
+        <span class="ctad">Got switched off with no reason? Report it anonymously in 30 seconds and see how many other drivers got the same treatment.</span>
         <span class="ctago">Add your report &rarr;</span>
       </a>
     </div>
@@ -432,8 +427,8 @@
 </main>
 
 <footer class="wrap">
-  <p class="disclaim"><strong>Zilch takes no commission and arranges no rides.</strong> Profiles are created and owned by drivers. Anything you agree with a driver is between the two of you.</p>
-  <p>Pay figures from Minn. Stat. § 181C.03, RCW 49.46.300 and 35 RCNY § 59B-23. Rates change — verify before relying on any of it. This is not legal advice. The whole thing is open source; run your own copy anywhere.</p>
+  <p class="disclaim"><strong>Zilch takes no commission and doesn't arrange rides.</strong> Drivers make and own their profiles. Whatever you work out with a driver is between the two of you.</p>
+  <p>Pay figures from Minn. Stat. § 181C.03, RCW 49.46.300 and 35 RCNY § 59B-23. Rates change, so double-check before you rely on any of it. Not legal advice. The whole thing is open source, run your own copy if you want.</p>
 </footer>
 <script src="auth.js"></script>
 <script src="pwa.js"></script>

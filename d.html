@@ -302,7 +302,7 @@
   }
 
   function paint(d){
-    document.title = d.name + " — Zilch";
+    document.title = d.name + " on Zilch";
 
     var verified = d.verified === "screenshot" || d.verified === "email";
     var b = $("badge");
@@ -350,11 +350,11 @@
     if (navigator.share){
       $("bShare").hidden = false;
       $("bShare").addEventListener("click", function(){
-        navigator.share({title: d.name + " — Zilch", url: url}).catch(function(){});
+        navigator.share({title: d.name + " on Zilch", url: url}).catch(function(){});
       });
     }
 
-    $("bSms").href = "sms:?&body=" + encodeURIComponent(d.name + " — my driver. " + url);
+    $("bSms").href = "sms:?&body=" + encodeURIComponent(d.name + ", my driver: " + url);
 
     var vcard = [
       "BEGIN:VCARD","VERSION:3.0",

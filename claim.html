@@ -183,7 +183,7 @@
   <div class="intro">
     <span class="eyebrow">For drivers</span>
     <h1>Your record.<br>Your <em>name</em>.</h1>
-    <p>Six thousand trips at 4.97 and none of it is yours — it lives in an app you don't control and disappears the day they deactivate you. Build a profile you own and hand out to anyone.</p>
+    <p>Six thousand trips at 4.97 and none of it is yours. It lives in their app and it's gone the day they deactivate you. Build a profile you own and hand out to anyone.</p>
   </div>
 
   <div class="form" id="form">
@@ -298,7 +298,7 @@
 
     <div class="card">
       <h2>How people reach you</h2>
-      <p class="sub">Shown on your profile. Use a number you're fine giving out — a Google Voice line works well.</p>
+      <p class="sub">Shown on your profile. Use a number you're fine giving out. A Google Voice number works.</p>
 
       <div class="two">
         <div class="field">
@@ -433,7 +433,7 @@
     var cval    = $("fCVal").value.trim().slice(0,60);
     var e = $("err");
 
-    if (!name){ e.textContent = "First name is needed — it's what people remember."; return; }
+    if (!name){ e.textContent = "Need a first name. It's what people remember."; return; }
     var email = $("fEmail").value.trim();
     if (!editing && !zilchAuth.session && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){
       e.textContent = "Add your email at the bottom so you can get back into your profile."; $("fEmail").focus(); return;
