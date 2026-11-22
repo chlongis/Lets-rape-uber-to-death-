@@ -1,0 +1,10 @@
+# Only the Edge Function settings Zilch needs. Deploy with:
+#   supabase functions deploy payments
+#   supabase functions deploy stripe-webhook --no-verify-jwt
+
+[functions.payments]
+verify_jwt = true
+
+[functions.stripe-webhook]
+# Stripe can't send a Supabase login token; the webhook checks Stripe's signature instead.
+verify_jwt = false

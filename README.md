@@ -59,6 +59,40 @@ You need a free [Supabase](https://supabase.com) account and a GitHub account. N
 
 The site is a progressive web app. On Android, Chrome offers an **Install** button; on iPhone, Safari's Share → **Add to Home Screen**. It opens full-screen with its own icon, and the offer check and receipt card keep working with no signal (`sw.js` caches the pages; database calls are never cached). `pwa.js` handles the install prompt and the phone nav.
 
+## Card payments (Stripe) and messages
+
+**Messages** work as soon as you run the latest `schema.sql`. Once a driver claims a job, the poster and the driver each get a **Messages** button on the card. Only those two can read the thread.
+
+**Card payments** need a Stripe account and two Supabase Edge Functions. Until they're set up, the board just says payments aren't set up and everything else keeps working.
+
+How the money moves: a driver connects a free Stripe Express account once. When a driver claims a job, the poster taps **Pay by card** and goes through Stripe Checkout. The charge is made on the driver's own Stripe account, so the money is the driver's from the start, Stripe's fee comes out of the driver's side, and Zilch takes nothing and never holds funds. The card is only authorized at checkout. It's captured when the poster taps **Done, release**, or dropped if they tap **Cancel payment**. An authorization that's never released expires after 7 days.
+
+Setup, about 20 minutes:
+
+1. **Stripe account.** Sign up at stripe.com. In the dashboard, open **Connect** and finish the platform setup (choose Express accounts). Stay in **test mode** until everything works.
+2. **Supabase CLI.** Install it (`npm i -g supabase` or see supabase.com/docs/guides/cli), then from this repo:
+   ```bash
+   supabase login
+   supabase link --project-ref <your-project-ref>
+   ```
+3. **Secrets.** Use your Stripe *secret* key (`sk_test_...` for testing). `SITE_URL` is your GitHub Pages address, which stops anyone pointing the Stripe redirects at another site.
+   ```bash
+   supabase secrets set STRIPE_SECRET_KEY=sk_test_xxx SITE_URL=https://<you>.github.io/<repo>
+   ```
+4. **Deploy the functions.**
+   ```bash
+   supabase functions deploy payments
+   supabase functions deploy stripe-webhook --no-verify-jwt
+   ```
+5. **Webhook.** In Stripe → Developers → Webhooks, add an endpoint that listens to **events on Connected accounts**, URL `https://<project-ref>.supabase.co/functions/v1/stripe-webhook`, events `checkout.session.completed`, `account.updated` and `payment_intent.canceled`. Copy its signing secret and run:
+   ```bash
+   supabase secrets set STRIPE_WEBHOOK_SECRET=whsec_xxx
+   ```
+6. **Test.** In driver mode tap **Set up payouts** and use Stripe's test data. Post a job from another browser, claim it, pay with card `4242 4242 4242 4242`, then tap **Done, release**. The payment shows up on the connected account in Stripe.
+7. **Go live** by repeating steps 3 and 5 with your live keys.
+
+Payout accounts are tied to the browser that set them up, like profiles. A driver who clears their browser data would have to connect again.
+
 ## How some of it works
 
 **Nothing secret is in a public table.** The anon key is public, so anything it can read is public. Job-post contact details and ownership records live in private tables with no policies, and every write goes through a `SECURITY DEFINER` function in `schema.sql`. Each browser makes a random secret (`zilch.secret.v1` in localStorage) and only its SHA-256 hash is stored. Holding the secret is what lets you edit or delete your profile and see the contact for jobs you claimed. Clear your browser data and you lose that access.
@@ -89,8 +123,6 @@ Sources: Minn. Stat. § 181C.03, RCW 49.46.300, 35 RCNY § 59B-23.
 ## Not built yet
 
 - Accounts and identity
-- Payments
-- In-app messaging after a claim
 - DKIM-verified stats — driver forwards their weekly platform summary as an attachment, a worker validates the signature against the platform's DNS key, and the numbers become near-unfakeable. Needs a domain and a mail worker.
 
 ---

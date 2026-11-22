@@ -233,6 +233,36 @@
   .banner b{color:var(--text)}
   footer{max-width:1180px;margin:0 auto;padding:0 22px 56px;color:var(--text-3);font-size:12.5px;line-height:1.6}
   footer p{max-width:80ch;margin-bottom:9px}
+  /* payments + chat */
+  .payout{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 12px;margin:0 0 12px;
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);font-size:13.5px;color:var(--text-2)}
+  .payout b{color:var(--text)}
+  .payout.on{border-color:var(--open);background:var(--open-bg)}
+  .payout.on b{color:var(--open)}
+  .sbtn{font:inherit;font-size:13px;font-weight:600;padding:8px 12px;cursor:pointer;border-radius:var(--radius);
+    background:var(--surface);color:var(--text);border:1px solid var(--line);white-space:nowrap}
+  .sbtn:hover{border-color:var(--text-3)}
+  .sbtn.pri{background:var(--accent);border-color:var(--accent);color:#0E1620}
+  .sbtn.ok{background:var(--open);border-color:var(--open);color:#fff}
+  .sbtn:disabled{opacity:.45;cursor:default}
+  .paynote{font-size:12px;color:var(--text-3);max-width:170px}
+  .paynote.ok{color:var(--open);font-weight:600}
+  .t-mine{background:var(--surface-2);color:var(--text-2)}
+  .chat{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:0 12px 48px rgba(0,0,0,.35);
+    width:100%;max-width:480px;height:min(640px,86vh);display:flex;flex-direction:column}
+  .chat-head{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line)}
+  .chat-head h2{font-size:15px;margin:0}
+  .chat-head p{font-size:12px;color:var(--text-3);margin:2px 0 0}
+  .thread{flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+  .msg{max-width:80%;padding:8px 11px;border-radius:12px;font-size:14.5px;line-height:1.4;white-space:pre-wrap;word-wrap:break-word}
+  .msg.me{align-self:flex-end;background:var(--accent);color:#0E1620;border-bottom-right-radius:3px}
+  .msg.them{align-self:flex-start;background:var(--surface-2);color:var(--text);border-bottom-left-radius:3px}
+  .msg time{display:block;font-size:10.5px;opacity:.65;margin-top:2px}
+  .thread .none{margin:auto;color:var(--text-3);font-size:13.5px;text-align:center}
+  .compose{display:flex;gap:8px;padding:10px;border-top:1px solid var(--line)}
+  .compose textarea{flex:1;min-height:44px;max-height:120px;resize:none;font:inherit;font-size:15px;padding:10px 12px;
+    background:var(--surface);color:var(--text);border:1px solid var(--line);border-radius:var(--radius)}
+  .chat-err{font-size:12.5px;color:#A8402B;padding:0 12px 8px;min-height:0}
   /* insurance gate */
   .overlay{position:fixed;inset:0;background:rgba(14,22,32,.72);z-index:100;display:flex;align-items:center;justify-content:center;padding:20px}
   .gate{
@@ -397,7 +427,23 @@
         <button type="button" data-a="plymouth" id="aPlymouth" aria-pressed="false">Plymouth</button>
       </div>
     </div>
+    <div class="payout" id="payoutBar" hidden></div>
     <div class="list" id="list"></div>
+  </div>
+</div>
+
+<div class="overlay" id="chatBox" hidden>
+  <div class="chat" role="dialog" aria-labelledby="chatTitle">
+    <div class="chat-head">
+      <div><h2 id="chatTitle">Messages</h2><p id="chatSub"></p></div>
+      <button class="sbtn" id="chatClose">Close</button>
+    </div>
+    <div class="thread" id="thread"></div>
+    <div class="chat-err" id="chatErr"></div>
+    <div class="compose">
+      <textarea id="chatInput" maxlength="1000" placeholder="Gate code, which door, running late&hellip;"></textarea>
+      <button class="sbtn pri" id="chatSend">Send</button>
+    </div>
   </div>
 </div>
 
@@ -451,13 +497,145 @@
     try { localStorage.setItem(SECRET_KEY, secret); } catch(e){}
   }
 
-  var myContacts = {};   // request id -> contact, for jobs this browser claimed
-  async function loadMyClaims(){
-    var res = await sb.rpc("my_claims", {p_secret: secret});
+  var myJobs = {};   // request id -> {role, contact, payable} for jobs this browser posted or claimed
+  async function loadMyJobs(){
+    var res = await sb.rpc("my_jobs", {p_secret: secret});
     if (res.error || !res.data) return;
-    myContacts = {};
-    res.data.forEach(function(c){ myContacts[c.request_id] = c.contact || ""; });
+    myJobs = {};
+    res.data.forEach(function(j){ myJobs[j.request_id] = {role: j.role, contact: j.contact || "", payable: !!j.driver_payable}; });
   }
+
+  /* --- payments (Stripe, via the "payments" Edge Function) --- */
+  var here = location.origin + location.pathname;
+  async function pay(action, extra){
+    var body = Object.assign({action: action, secret: secret}, extra || {});
+    var res = await sb.functions.invoke("payments", {body: body});
+    if (res.error){
+      var msg = "Payments aren't set up yet.";
+      try { var j = await res.error.context.json(); if (j && j.error) msg = j.error; } catch(e){}
+      throw new Error(msg);
+    }
+    return res.data || {};
+  }
+
+  var payoutState = null;   // null | "started" | "ready"
+  async function loadPayout(refresh){
+    var r = await sb.rpc("my_payout", {p_secret: secret});
+    payoutState = r.error ? null : r.data;
+    if (refresh && payoutState === "started"){
+      try { var st = await pay("status"); payoutState = st.ready ? "ready" : "started"; } catch(e){}
+    }
+    renderPayout();
+  }
+  function renderPayout(){
+    var bar = $("payoutBar");
+    bar.hidden = mode !== "drive";
+    if (payoutState === "ready"){
+      bar.className = "payout on";
+      bar.innerHTML = "<b>Card payouts on.</b> Posters can pay you by card. Money goes straight to your Stripe account.";
+      return;
+    }
+    bar.className = "payout";
+    bar.innerHTML = (payoutState === "started"
+        ? "<span><b>Finish payout setup</b> so posters can pay you by card.</span>"
+        : "<span><b>Get paid by card.</b> Connect a free Stripe payout account. Zilch takes nothing.</span>") +
+      '<button class="sbtn pri" id="bPayout">' + (payoutState === "started" ? "Finish setup" : "Set up payouts") + '</button>';
+    $("bPayout").addEventListener("click", async function(){
+      var b = $("bPayout"); b.disabled = true; b.textContent = "Opening Stripe\u2026";
+      try { var r = await pay("onboard", {return_url: here + "?payouts=1"}); location.href = r.url; }
+      catch(e){ b.disabled = false; b.textContent = "Try again"; bar.querySelector("span").textContent = e.message; }
+    });
+  }
+
+  async function payAction(action, id, btn){
+    btn.disabled = true;
+    var label = btn.textContent;
+    btn.textContent = "One sec\u2026";
+    try {
+      if (action === "checkout"){
+        var r = await pay("checkout", {request_id: id, return_url: here});
+        location.href = r.url;
+        return;
+      }
+      if (action === "cancel" && !window.confirm("Cancel the payment hold? Your card won't be charged.")){ btn.disabled = false; btn.textContent = label; return; }
+      await pay(action, {request_id: id});
+      load();
+    } catch(e){
+      btn.disabled = false; btn.textContent = label;
+      window.alert(e.message);
+    }
+  }
+
+  function payBlock(r, mine){
+    var st = r.pay_status || "none", amt = "$" + Number(r.offer || 0).toFixed(0);
+    if (!mine || r.status !== "claimed") return "";
+    if (mine.role === "poster"){
+      if (st === "none")  return mine.payable
+        ? '<button class="sbtn pri" data-pay="checkout" data-id="' + esc(r.id) + '">Pay ' + amt + ' by card</button>'
+        : '<div class="paynote">Driver hasn\u2019t switched on card payouts. Pay them directly.</div>';
+      if (st === "held")  return '<button class="sbtn ok" data-pay="release" data-id="' + esc(r.id) + '">Done \u2014 release ' + amt + '</button>' +
+                                 '<button class="sbtn" data-pay="cancel" data-id="' + esc(r.id) + '">Cancel payment</button>';
+      if (st === "paid")  return '<div class="paynote ok">Paid ' + amt + ' \u2713</div>';
+      return '<div class="paynote">Payment canceled</div>';
+    }
+    if (st === "held") return '<div class="paynote">' + amt + ' held. It\u2019s yours when they tap Done.</div>';
+    if (st === "paid") return '<div class="paynote ok">You got paid ' + amt + ' \u2713</div>';
+    if (st === "canceled") return '<div class="paynote">Payment canceled</div>';
+    return "";
+  }
+
+  /* --- chat --- */
+  var chatId = null, chatRole = null, chatLast = 0, chatTimer = null;
+  function fmtTime(t){ try { return new Date(t).toLocaleTimeString([], {hour:"numeric", minute:"2-digit"}); } catch(e){ return ""; } }
+  function addMsgs(list){
+    var th = $("thread");
+    if (list.length && th.querySelector(".none")) th.innerHTML = "";
+    list.forEach(function(m){
+      chatLast = Math.max(chatLast, m.id);
+      var d = document.createElement("div");
+      d.className = "msg " + (m.sender === chatRole ? "me" : "them");
+      d.textContent = m.body;
+      var tm = document.createElement("time"); tm.textContent = fmtTime(m.created_at); d.appendChild(tm);
+      th.appendChild(d);
+    });
+    if (list.length) th.scrollTop = th.scrollHeight;
+  }
+  async function pollChat(){
+    if (!chatId) return;
+    var res = await sb.rpc("get_messages", {p_secret: secret, p_request: chatId, p_after: chatLast});
+    if (!res.error && res.data) addMsgs(res.data);
+  }
+  function openChat(id){
+    var r = rows.filter(function(x){ return x.id === id; })[0];
+    var mine = myJobs[id];
+    if (!r || !mine) return;
+    chatId = id; chatRole = mine.role; chatLast = 0;
+    $("chatTitle").textContent = mine.role === "poster" ? "Chat with " + (r.claimed_name || "your driver") : "Chat with " + (r.name || "the poster");
+    $("chatSub").textContent = r.pickup + " \u2192 " + r.dropoff;
+    $("thread").innerHTML = '<p class="none">No messages yet. Only the two of you can see this.</p>';
+    $("chatErr").textContent = "";
+    $("chatBox").hidden = false;
+    $("chatInput").focus();
+    pollChat();
+    clearInterval(chatTimer);
+    chatTimer = setInterval(pollChat, 4000);
+  }
+  function closeChat(){ chatId = null; clearInterval(chatTimer); $("chatBox").hidden = true; }
+  $("chatClose").addEventListener("click", closeChat);
+  $("chatBox").addEventListener("click", function(e){ if (e.target === $("chatBox")) closeChat(); });
+  document.addEventListener("keydown", function(e){ if (e.key === "Escape" && !$("chatBox").hidden) closeChat(); });
+  async function sendChat(){
+    var txt = $("chatInput").value.trim();
+    if (!txt || !chatId) return;
+    $("chatSend").disabled = true;
+    var res = await sb.rpc("send_message", {p_secret: secret, p_request: chatId, p_body: txt});
+    $("chatSend").disabled = false;
+    if (res.error){ $("chatErr").textContent = "Didn't send. " + (res.error.message || ""); return; }
+    $("chatInput").value = ""; $("chatErr").textContent = "";
+    pollChat();
+  }
+  $("chatSend").addEventListener("click", sendChat);
+  $("chatInput").addEventListener("keydown", function(e){ if (e.key === "Enter" && !e.shiftKey){ e.preventDefault(); sendChat(); } });
 
   function setAreaFilter(a){
     areaFilter = a;
@@ -539,6 +717,7 @@
     $("mDrive").setAttribute("aria-pressed", "true");
     $("postPanel").hidden = true;
     $("areaBar").hidden = false;
+    renderPayout();
     $("boardTitle").textContent = "Jobs you can claim";
     if (filter === "all"){ setFilter("open"); } else { render(); }
   }
@@ -553,6 +732,7 @@
     $("mDrive").setAttribute("aria-pressed", String(m === "drive"));
     $("postPanel").hidden = (m === "drive");
     $("areaBar").hidden = (m !== "drive");
+    renderPayout();
     $("boardTitle").textContent = m === "drive" ? "Jobs you can claim" : "Open jobs";
     if (m === "drive" && filter === "all"){ setFilter("open"); } else { render(); }
   }
@@ -613,13 +793,15 @@
 
     list.innerHTML = shown.map(function(r){
       var claimed = r.status === "claimed";
-      var mineClaim = claimed && Object.prototype.hasOwnProperty.call(myContacts, r.id);
+      var mine = myJobs[r.id] || null;
+      var mineClaim = claimed && mine && mine.role === "driver";
+      var minePost = mine && mine.role === "poster";
       var isRide = r.kind === "ride";
       var areaLabel = r.area ? AREA_LABELS[r.area] || r.area : "";
       var contactBlock = "";
       if (mineClaim){
-        contactBlock = myContacts[r.id]
-          ? '<div class="contact-reveal"><span class="contact-label">How to reach them</span>' + esc(myContacts[r.id]) + '</div>'
+        contactBlock = mine.contact
+          ? '<div class="contact-reveal"><span class="contact-label">How to reach them</span>' + esc(mine.contact) + '</div>'
           : '<div class="contact-reveal" style="opacity:.6;font-style:italic">No contact info left \u2014 try posting in your area group that you have the job.</div>';
       }
       return '' +
@@ -629,6 +811,7 @@
             '<span class="tag ' + (isRide ? "t-ride" : "t-food") + '">' + (isRide ? "Ride" : "Delivery") + '</span>' +
             '<span class="tag ' + (claimed ? "t-claimed" : "t-open") + '">' + (claimed ? "Claimed" : "Open") + '</span>' +
             (areaLabel ? '<span class="area-tag">' + esc(areaLabel) + '</span>' : "") +
+            (minePost ? '<span class="tag t-mine">Your post</span>' : "") +
           '</div>' +
           '<div class="route">' + esc(r.pickup) +
             '<span class="arrow">\u2192</span>' + esc(r.dropoff) + '</div>' +
@@ -641,12 +824,20 @@
           '<div class="offer">$' + Number(r.offer || 0).toFixed(0) +
             '<small>' + (claimed ? "to driver" : "you keep 100%") + '</small></div>' +
           (claimed
-            ? '<div class="claimedby">' + (mineClaim ? "You claimed this" : "Taken by " + esc(r.claimed_name || "a driver")) + '</div>'
+            ? '<div class="claimedby">' + (mineClaim ? "You claimed this" : minePost ? "Claimed by " + esc(r.claimed_name || "a driver") : "Taken by " + esc(r.claimed_name || "a driver")) + '</div>' +
+              payBlock(r, mine) +
+              (mine ? '<button class="sbtn" data-chat="' + esc(r.id) + '">Messages</button>' : "")
             : '<button class="claim" data-id="' + esc(r.id) + '">Claim it</button>') +
         '</div>' +
       '</div>';
     }).join("");
 
+    Array.prototype.forEach.call(list.querySelectorAll("[data-chat]"), function(b){
+      b.addEventListener("click", function(){ openChat(b.getAttribute("data-chat")); });
+    });
+    Array.prototype.forEach.call(list.querySelectorAll("[data-pay]"), function(b){
+      b.addEventListener("click", function(){ payAction(b.getAttribute("data-pay"), b.getAttribute("data-id"), b); });
+    });
     Array.prototype.forEach.call(list.querySelectorAll(".claim"), function(b){
       b.addEventListener("click", function(){ claim(b.getAttribute("data-id"), b); });
     });
@@ -655,7 +846,7 @@
   async function load(){
     var both = await Promise.all([
       sb.from("requests").select("*").order("created_at", {ascending:false}).limit(60),
-      loadMyClaims()
+      loadMyJobs()
     ]);
     var res = both[0];
     if (res.error){
@@ -724,6 +915,16 @@
 
   render();
   load();
+
+  var qs = new URLSearchParams(location.search);
+  loadPayout(qs.has("payouts"));
+  if (qs.has("paid")){
+    var note = document.createElement("div");
+    note.className = "payout on";
+    note.innerHTML = "<b>Payment held.</b> Your card is authorized, not charged yet. Tap \u201CDone\u201D on the job once it\u2019s finished and it goes to your driver.";
+    $("list").parentNode.insertBefore(note, $("list"));
+  }
+  if (qs.has("paid") || qs.has("payouts")) history.replaceState(null, "", location.pathname);
 
   sb.channel("requests-live")
     .on("postgres_changes", {event:"*", schema:"public", table:"requests"}, load)

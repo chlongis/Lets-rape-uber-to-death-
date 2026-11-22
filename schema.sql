@@ -350,6 +350,175 @@ grant execute on function create_driver(text, jsonb), update_driver(text, text, 
   my_claims(text), owns_driver(text, text) to anon, authenticated;
 
 -- ---------------------------------------------------------------
+-- Messages and payments
+-- ---------------------------------------------------------------
+-- Private chat between the poster of a job and the driver who claimed it.
+create table if not exists messages (
+  id bigint generated always as identity primary key,
+  request_id uuid not null references requests(id) on delete cascade,
+  sender text not null check (sender in ('poster', 'driver')),
+  body text not null check (length(body) between 1 and 1000),
+  created_at timestamptz default now()
+);
+create index if not exists messages_request_idx on messages (request_id, id);
+
+-- A driver's Stripe Connect account, keyed by their browser secret's hash.
+create table if not exists payout_accounts (
+  owner_hash text primary key,
+  stripe_account text not null unique,
+  ready boolean not null default false,
+  created_at timestamptz default now()
+);
+
+alter table request_private add column if not exists driver_account text;
+alter table request_private add column if not exists checkout_session text;
+alter table request_private add column if not exists payment_intent text;
+
+-- Public, non-secret payment state shown on the board.
+alter table requests add column if not exists pay_status text not null default 'none';
+do $$ begin
+  if not exists (select 1 from pg_constraint where conname = 'requests_pay_status_check') then
+    alter table requests add constraint requests_pay_status_check
+      check (pay_status in ('none', 'held', 'paid', 'canceled'));
+  end if;
+end $$;
+
+alter table messages        enable row level security;
+alter table payout_accounts enable row level security;
+
+-- Which side of a job this secret is on: 'poster', 'driver' or null.
+create or replace function zilch_role(p_secret text, p_request uuid) returns text
+language sql stable security definer set search_path = public as $$
+  select case when rp.poster_hash  = zilch_hash(p_secret) then 'poster'
+              when rp.claimer_hash = zilch_hash(p_secret) then 'driver' end
+    from request_private rp where rp.request_id = p_request;
+$$;
+
+-- Every job this browser posted or claimed, for the board.
+create or replace function my_jobs(p_secret text)
+returns table (request_id uuid, role text, contact text, driver_payable boolean)
+language sql stable security definer set search_path = public as $$
+  select rp.request_id,
+         case when rp.poster_hash = zilch_hash(p_secret) then 'poster' else 'driver' end,
+         case when rp.claimer_hash = zilch_hash(p_secret) then rp.contact end,
+         exists (select 1 from payout_accounts pa where pa.owner_hash = rp.claimer_hash and pa.ready)
+    from request_private rp
+   where rp.poster_hash = zilch_hash(p_secret) or rp.claimer_hash = zilch_hash(p_secret);
+$$;
+
+create or replace function send_message(p_secret text, p_request uuid, p_body text) returns bigint
+language plpgsql security definer set search_path = public as $$
+declare v_role text := zilch_role(p_secret, p_request); v_id bigint;
+begin
+  if v_role is null then raise exception 'not your job'; end if;
+  if not exists (select 1 from requests where id = p_request and status = 'claimed') then
+    raise exception 'chat opens once a driver claims the job';
+  end if;
+  if coalesce(trim(p_body), '') = '' then raise exception 'empty message'; end if;
+  insert into messages (request_id, sender, body)
+  values (p_request, v_role, left(trim(p_body), 1000))
+  returning id into v_id;
+  return v_id;
+end $$;
+
+create or replace function get_messages(p_secret text, p_request uuid, p_after bigint default 0)
+returns table (id bigint, sender text, body text, created_at timestamptz)
+language sql stable security definer set search_path = public as $$
+  select m.id, m.sender, m.body, m.created_at from messages m
+   where m.request_id = p_request and zilch_role(p_secret, p_request) is not null
+     and m.id > coalesce(p_after, 0)
+   order by m.id limit 200;
+$$;
+
+create or replace function my_payout(p_secret text) returns text
+language sql stable security definer set search_path = public as $$
+  select case when pa.ready then 'ready' else 'started' end
+    from payout_accounts pa where pa.owner_hash = zilch_hash(p_secret);
+$$;
+
+-- The rest are called only by the Edge Functions, which use the service role.
+create or replace function pay_get_account(p_secret text) returns text
+language sql stable security definer set search_path = public as $$
+  select stripe_account from payout_accounts where owner_hash = zilch_hash(p_secret);
+$$;
+
+create or replace function pay_set_account(p_secret text, p_account text) returns void
+language sql security definer set search_path = public as $$
+  insert into payout_accounts (owner_hash, stripe_account) values (zilch_hash(p_secret), p_account)
+  on conflict (owner_hash) do update set stripe_account = excluded.stripe_account;
+$$;
+
+create or replace function pay_mark_ready(p_account text, p_ready boolean) returns void
+language sql security definer set search_path = public as $$
+  update payout_accounts set ready = p_ready where stripe_account = p_account;
+$$;
+
+-- For the poster about to pay: the job and the claiming driver's account.
+create or replace function pay_prepare(p_secret text, p_request uuid)
+returns table (offer numeric, kind text, pickup text, dropoff text, pay_status text, driver_account text)
+language sql stable security definer set search_path = public as $$
+  select r.offer, r.kind, r.pickup, r.dropoff, r.pay_status, pa.stripe_account
+    from requests r
+    join request_private rp on rp.request_id = r.id
+    left join payout_accounts pa on pa.owner_hash = rp.claimer_hash and pa.ready
+   where r.id = p_request and r.status = 'claimed'
+     and rp.poster_hash = zilch_hash(p_secret);
+$$;
+
+create or replace function pay_record_session(p_request uuid, p_session text, p_account text) returns void
+language sql security definer set search_path = public as $$
+  update request_private set checkout_session = p_session, driver_account = p_account
+   where request_id = p_request;
+$$;
+
+create or replace function pay_held(p_session text, p_intent text) returns void
+language sql security definer set search_path = public as $$
+  with u as (
+    update request_private set payment_intent = p_intent
+     where checkout_session = p_session returning request_id
+  )
+  update requests set pay_status = 'held' where id in (select request_id from u) and pay_status = 'none';
+$$;
+
+create or replace function pay_lookup(p_secret text, p_request uuid)
+returns table (payment_intent text, driver_account text, pay_status text)
+language sql stable security definer set search_path = public as $$
+  select rp.payment_intent, rp.driver_account, r.pay_status
+    from request_private rp join requests r on r.id = rp.request_id
+   where rp.request_id = p_request and rp.poster_hash = zilch_hash(p_secret);
+$$;
+
+create or replace function pay_set_status(p_request uuid, p_status text) returns void
+language sql security definer set search_path = public as $$
+  update requests set pay_status = p_status where id = p_request;
+$$;
+
+create or replace function pay_status_by_intent(p_intent text, p_status text) returns void
+language sql security definer set search_path = public as $$
+  update requests set pay_status = p_status
+   where id in (select request_id from request_private where payment_intent = p_intent);
+$$;
+
+revoke all on function zilch_role(text, uuid), my_jobs(text), send_message(text, uuid, text),
+  get_messages(text, uuid, bigint), my_payout(text) from public;
+grant execute on function my_jobs(text), send_message(text, uuid, text),
+  get_messages(text, uuid, bigint), my_payout(text) to anon, authenticated;
+
+do $$
+declare f text;
+begin
+  foreach f in array array[
+    'pay_get_account(text)', 'pay_set_account(text, text)', 'pay_mark_ready(text, boolean)',
+    'pay_prepare(text, uuid)', 'pay_record_session(uuid, text, text)', 'pay_held(text, text)',
+    'pay_lookup(text, uuid)', 'pay_set_status(uuid, text)', 'pay_status_by_intent(text, text)'] loop
+    execute format('revoke all on function %s from public, anon, authenticated', f);
+    if exists (select 1 from pg_roles where rolname = 'service_role') then
+      execute format('grant execute on function %s to service_role', f);
+    end if;
+  end loop;
+end $$;
+
+-- ---------------------------------------------------------------
 -- Realtime (public tables only — the private ones are never broadcast)
 -- ---------------------------------------------------------------
 do $$
