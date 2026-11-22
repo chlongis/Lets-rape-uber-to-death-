@@ -259,27 +259,17 @@
       if (r.warned !== null){ wKnown++; if (r.warned) warned++; }
       if (r.appealed && (r.reinstated === "yes" || r.reinstated === "no")){ appeals++; if (r.reinstated === "yes") back++; }
     });
-    // Display bump: the site is new, so show a modest floor of past reports
-    // (counts only — no fake rows, no fake profiles). Remove this block to
-    // show the raw numbers again.
-    var BUMP = 34;
-    rows.length = rows.length + BUMP;
-    byR.none = (byR.none || 0) + Math.round(BUMP * 0.62);
-    byR.ratings = (byR.ratings || 0) + 3;
-    byR.acceptance = (byR.acceptance || 0) + 2;
-    byR.other = (byR.other || 0) + 2;
-    byA.Uber = (byA.Uber || 0) + 21;
-    byA.Lyft = (byA.Lyft || 0) + 13;
-    none = Math.round(rows.length * 0.62);
-    wKnown = Math.round(rows.length * 0.8);
-    warned = Math.round(wKnown * 0.18);
-    appeals = Math.round(rows.length * 0.25);
-    back = Math.round(appeals * 0.3);
     $("kTotal").textContent = rows.length.toLocaleString("en-US");
-    $("pctNone").textContent = rows.length ? pct(none, rows.length) : "—";
-    $("pctNoneT").textContent = rows.length
-      ? "of " + rows.length + " reported deactivation" + (rows.length === 1 ? "" : "s") + " came with no reason at all."
-      : "No reports yet. Yours could be the first.";
+    var MIN = 20;   // don't headline a percentage off a handful of reports
+    if (rows.length >= MIN){
+      $("pctNone").textContent = pct(none, rows.length);
+      $("pctNoneT").textContent = "of " + rows.length + " reported deactivations came with no reason at all.";
+    } else {
+      $("pctNone").textContent = rows.length + "/" + MIN;
+      $("pctNoneT").textContent = rows.length
+        ? "Just launched. Real reports so far. The headline number appears at " + MIN + ", so send this to drivers you know who got switched off."
+        : "Just launched. Be one of the first " + MIN + " reports. The headline number appears once there are enough to mean something.";
+    }
     $("kWarned").textContent = pct(warned, wKnown);
     $("kBack").textContent = pct(back, appeals);
     bars($("byReason"), byR, REASONS, "none");

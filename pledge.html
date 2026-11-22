@@ -387,14 +387,6 @@
   }
 
   function render(){
-    // Display bump: show a couple of early driver pledges (bandwagon appeal).
-    // Counts only — no fake rows, no fake profiles. Remove this block to
-    // show the raw numbers again.
-    AREAS.forEach(function(a){
-      if (a.id === "waconia") a.drivers = (a.drivers || 0) + 2;
-      if (a.id === "hopkins") a.drivers = (a.drivers || 0) + 1;
-      if (a.id === "minnetonka") a.drivers = (a.drivers || 0) + 1;
-    });
     var host = $("cells");
     var by = tally();
     var ordered = AREAS.slice().sort(function(a, b){
