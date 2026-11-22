@@ -297,7 +297,7 @@
 </header>
 
 <main>
-<div class="ticker" aria-hidden="true"><span>0% COMMISSION &nbsp;★&nbsp; KEEP THE WHOLE FARE &nbsp;★&nbsp; SCREENSHOT YOUR LOWBALLS &nbsp;★&nbsp; MN DELIVERY DRIVERS HAVE NO PAY FLOOR. NONE. &nbsp;★&nbsp; FUCK THE MIDDLEMAN &nbsp;★&nbsp; DOORDASH IS THE GOOCH: THE SPACE BETWEEN YOU AND YOUR MONEY &nbsp;★&nbsp; IT'S FREE, NO CATCH &nbsp;★&nbsp; YOUR RATING SHOULD BE YOURS &nbsp;★&nbsp; 0% COMMISSION &nbsp;★&nbsp; KEEP THE WHOLE FARE &nbsp;★&nbsp;</span></div>
+<div class="ticker" aria-hidden="true"><span id="tick">0% COMMISSION &nbsp;★&nbsp; KEEP THE WHOLE FARE &nbsp;★&nbsp; SCREENSHOT YOUR LOWBALLS &nbsp;★&nbsp; MN DELIVERY DRIVERS HAVE NO PAY FLOOR. NONE. &nbsp;★&nbsp; FUCK THE MIDDLEMAN &nbsp;★&nbsp; DOORDASH IS THE GOOCH: THE SPACE BETWEEN YOU AND YOUR MONEY &nbsp;★&nbsp; IT'S FREE, NO CATCH &nbsp;★&nbsp;</span></div>
   <div class="hero wrap">
     <h1>Work for yourself,<br> <em>for real this time</em>.</h1>
     <p class="hero-sub">Okay so heres the deal. Your rating is the most valuable thing you have and you cant take it anywhere, it lives in their app and the second they deactivate you its gone. <strong>So make one thats actually yours and cut out the middleman.</strong></p>
@@ -360,6 +360,36 @@
     return fetch(URL + "?select=platform,payout,miles,minutes,per_hour&order=per_hour.asc&limit=1" + (since ? "&created_at=gte." + since : ""),
       {headers:{apikey:KEY, Authorization:"Bearer " + KEY}}).then(function(r){ return r.json(); });
   }
+
+  // Ticker: real lowballs off the board mixed in with the slogans.
+  (function(){
+    var tick = document.getElementById("tick"); if (!tick) return;
+    var SLOGANS = ["0% COMMISSION", "KEEP THE WHOLE FARE", "SCREENSHOT YOUR LOWBALLS", "MN DELIVERY DRIVERS HAVE NO PAY FLOOR. NONE.",
+      "FUCK THE MIDDLEMAN", "DOORDASH IS THE GOOCH: THE SPACE BETWEEN YOU AND YOUR MONEY",
+      "UBER AND LYFT DRIVERS IN MN GET $1.28/MI MINIMUM. DASHERS GET NOTHING", "IT'S FREE, NO CATCH"];
+    fetch(URL + "?select=platform,payout,miles,per_hour&order=per_hour.asc&limit=40", {headers:{apikey:KEY, Authorization:"Bearer " + KEY}})
+      .then(function(r){ return r.json(); })
+      .then(function(rows){
+        if (!Array.isArray(rows) || !rows.length) return;
+        // Only real lowballs: under $15/hr after gas. Flexes don't go in the ticker.
+        var low = rows.filter(function(r){ return Number(r.per_hour) < 15; });
+        var offers = low.slice(0, 6).map(function(r){
+          return "REAL OFFER: " + String(r.platform || "AN APP").toUpperCase() + " " + money(r.payout) + " FOR " + Number(r.miles) + " MI = " + money(r.per_hour) + "/HR AFTER GAS";
+        });
+        var items = [];
+        if (rows.length >= 5 && low.length * 2 > rows.length){
+          items.push(low.length + " OF " + rows.length + " OFFERS POSTED HERE PAY UNDER $15/HR AFTER GAS");
+        }
+        var out = [], i = 0, j = 0;
+        while (i < SLOGANS.length || j < offers.length){
+          if (i < SLOGANS.length) out.push(SLOGANS[i++]);
+          if (j < offers.length) out.push(offers[j++]);
+        }
+        out = out.concat(items);
+        tick.textContent = out.join("  \u2605  ") + "  \u2605  ";
+        tick.style.animationDuration = Math.max(38, Math.round(tick.textContent.length * 0.16)) + "s";
+      }).catch(function(){});
+  })();
   q(d.toISOString()).then(function(rows){
     if (rows && rows.length) return [rows, true];
     return q(null).then(function(all){ return [all, false]; });
