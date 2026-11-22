@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Where the Money Went — Zilch</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+  :root{
+    --paper:#EEF1F4; --surface:#FFFFFF; --surface-2:#E4E9EE;
+    --line:#C8D2DA; --line-soft:#DCE3E9;
+    --text:#0E1620; --text-2:#4A5A68; --text-3:#738796;
+    --accent:#FFB020; --accent-ink:#8A5300;
+    --ok:#1E8A5C; --warn:#A8402B;
+    --shadow:0 1px 2px rgba(14,22,32,.05), 0 6px 18px -10px rgba(14,22,32,.16);
+    --radius:4px;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --paper:#0B1219; --surface:#121C26; --surface-2:#18242F;
+      --line:#2A3946; --line-soft:#1E2C38;
+      --text:#E8EEF3; --text-2:#A3B4C1; --text-3:#6F8494;
+      --accent:#FFB020; --accent-ink:#FFC65C;
+      --ok:#4FCB92; --warn:#E5806A;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.7);
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#0B1219; --surface:#121C26; --surface-2:#18242F;
+    --line:#2A3946; --line-soft:#1E2C38;
+    --text:#E8EEF3; --text-2:#A3B4C1; --text-3:#6F8494;
+    --accent:#FFB020; --accent-ink:#FFC65C;
+    --ok:#4FCB92; --warn:#E5806A;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.7);
+  }
+  *{box-sizing:border-box}
+  [hidden]{display:none!important}
+  body{margin:0;background:var(--paper);color:var(--text);
+    font-family:"IBM Plex Sans","Segoe UI",Helvetica,Arial,sans-serif;font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+  h1,h2,h3,p{margin:0}
+  .wrap{max-width:760px;margin:0 auto;padding:0 18px}
+  .eyebrow{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:10.5px;letter-spacing:.15em;text-transform:uppercase;font-weight:600;color:var(--text-3)}
+  .top{border-bottom:1px solid var(--line);background:var(--surface)}
+  .top-in{max-width:1180px;margin:0 auto;padding:12px 18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .wordmark{font-family:Anton,Impact,sans-serif;font-size:23px;letter-spacing:.02em;text-transform:uppercase;line-height:1;color:var(--text);text-decoration:none}
+  .wordmark span{color:var(--accent-ink)}
+  .sitenav{display:flex;gap:3px;align-items:center;flex-wrap:wrap}
+  .sitenav a{font-size:13px;font-weight:600;text-decoration:none;padding:7px 12px;color:var(--text-2);border:1px solid transparent;border-radius:3px}
+  .sitenav a:hover{color:var(--text);border-color:var(--line)}
+  .sitenav a[aria-current="page"]{color:var(--text);background:var(--surface-2);border-color:var(--line)}
+  .intro{padding:32px 0 22px}
+  .intro h1{font-family:Anton,Impact,sans-serif;text-transform:uppercase;font-size:clamp(32px,7vw,54px);line-height:.98;margin:12px 0 0}
+  .intro h1 em{font-style:normal;color:var(--accent-ink)}
+  .intro p{margin-top:14px;max-width:58ch;font-size:16px;color:var(--text-2)}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;margin-bottom:16px}
+  .card h2{font-size:16px;font-weight:600;margin-bottom:3px}
+  .card .sub{font-size:13px;color:var(--text-3);margin-bottom:14px}
+  label.fl{display:block;font-size:12.5px;font-weight:600;margin-bottom:3px;color:var(--text-2)}
+  .hint{font-size:12px;color:var(--text-3);margin-bottom:6px;line-height:1.4}
+  input,select{font:inherit;font-size:16px;padding:9px 11px;width:100%;background:var(--surface);color:var(--text);border:1px solid var(--line);border-radius:var(--radius)}
+  input[type=number]{font-family:"IBM Plex Mono",ui-monospace,monospace;font-weight:600;font-size:19px}
+  input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid var(--accent-ink);outline-offset:1px}
+  .grid{display:grid;gap:14px;grid-template-columns:1fr 1fr}
+  @media (max-width:520px){ .grid{grid-template-columns:1fr} }
+  .full{grid-column:1 / -1}
+  .preview{display:flex;justify-content:center;margin:6px 0 14px}
+  canvas{width:100%;max-width:420px;height:auto;border-radius:6px;box-shadow:var(--shadow)}
+  .btnrow{display:flex;gap:10px;flex-wrap:wrap}
+  .btn{font:inherit;font-size:14px;font-weight:600;padding:12px 16px;cursor:pointer;flex:1;background:var(--surface);color:var(--text);border:1px solid var(--line);border-radius:var(--radius)}
+  .btn.pri{background:var(--accent);border-color:var(--accent);color:#0E1620}
+  .btn:disabled{opacity:.4;cursor:default}
+  .msg{font-size:13.5px;color:var(--warn);min-height:1.2em;margin-top:8px}
+  .rules{font-size:13.5px;color:var(--text-2);line-height:1.6}
+  .rules li{margin-bottom:6px}
+  footer{padding:26px 0 60px;color:var(--text-3);font-size:12.5px;line-height:1.6}
+  footer p{max-width:76ch;margin-bottom:8px}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="top-in">
+    <a class="wordmark" href="index.html">Zil<span>ch</span></a>
+    <nav class="sitenav">
+      <a href="index.html">The pitch</a>
+      <a href="find.html">Find a driver</a>
+      <a href="claim.html">Claim profile</a>
+      <a href="board.html">Board</a>
+      <a href="offer.html">Offer check</a>
+      <a href="receipt.html" aria-current="page">Receipts</a>
+      <a href="deact.html">Deactivations</a>
+      <a href="paycheck.html">Pay check</a>
+    </nav>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="intro">
+    <span class="eyebrow">For drivers and customers</span>
+    <h1>Where did the <em>money</em> go?</h1>
+    <p>One order, three numbers: what the customer paid, what the food actually costs at the counter, and what the driver got. The rest went somewhere. Make a card and post it.</p>
+  </div>
+
+  <div class="card">
+    <h2>The order</h2>
+    <p class="sub">Use real numbers off a real receipt and pay screen. If you only know some of them, fill in what you can and the card will say what's missing.</p>
+    <div class="grid">
+      <div>
+        <label class="fl" for="app">App</label>
+        <select id="app">
+          <option value="a delivery app">Don't say</option>
+          <option>DoorDash</option>
+          <option>Uber Eats</option>
+          <option>Grubhub</option>
+          <option>Instacart</option>
+        </select>
+      </div>
+      <div>
+        <label class="fl" for="what">What was it?</label>
+        <input type="text" id="what" maxlength="40" placeholder="Burrito bowl + chips">
+      </div>
+      <div>
+        <label class="fl" for="paid">Customer paid, total</label>
+        <p class="hint">Everything on the receipt, including fees and tip, minus sales tax.</p>
+        <input type="number" id="paid" inputmode="decimal" min="0" step="0.01" placeholder="35.40">
+      </div>
+      <div>
+        <label class="fl" for="food">Same food at the counter</label>
+        <p class="hint">The restaurant's own in-store or website price.</p>
+        <input type="number" id="food" inputmode="decimal" min="0" step="0.01" placeholder="19.75">
+      </div>
+      <div>
+        <label class="fl" for="driver">Driver got, total</label>
+        <p class="hint">Base pay plus tip, from the driver's pay screen.</p>
+        <input type="number" id="driver" inputmode="decimal" min="0" step="0.01" placeholder="8.50">
+      </div>
+      <div>
+        <label class="fl" for="miles">Driver miles</label>
+        <p class="hint">Optional.</p>
+        <input type="number" id="miles" inputmode="decimal" min="0" step="0.1" placeholder="6.2">
+      </div>
+    </div>
+    <p class="msg" id="msg"></p>
+  </div>
+
+  <div class="card">
+    <h2>Your card</h2>
+    <p class="sub">Square, sized for Instagram, TikTok and X. Updates as you type.</p>
+    <div class="preview"><canvas id="cv" width="1080" height="1080"></canvas></div>
+    <div class="btnrow">
+      <button class="btn pri" id="bSave" disabled>Save image</button>
+      <button class="btn" id="bShare" hidden disabled>Share</button>
+      <button class="btn" id="bText" disabled>Copy caption</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Keep it bulletproof</h2>
+    <ul class="rules">
+      <li>Only post numbers you can show. Keep the receipt and the pay screenshot.</li>
+      <li>"The app kept" includes what the app paid the restaurant on top of the counter price, if anything, plus card fees. The card says so.</li>
+      <li>Post it as one real order, not as an average.</li>
+      <li>Black out names, addresses and order numbers before posting a screenshot next to it.</li>
+    </ul>
+  </div>
+</div>
+
+<footer class="wrap">
+  <p>Cards are made on your phone. Nothing you type here is uploaded or stored. Zilch isn't affiliated with any delivery app.</p>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+  var $ = function(id){ return document.getElementById(id); };
+  var cv = $("cv"), ctx = cv.getContext("2d");
+  var state = null;
+
+  function num(id){ var v = parseFloat($(id).value); return isFinite(v) && v >= 0 ? v : NaN; }
+  function m(v){ return "$" + v.toFixed(2); }
+
+  function compute(){
+    var paid = num("paid"), food = num("food"), driver = num("driver"), miles = num("miles");
+    var msg = "";
+    if (!(paid > 0)) { state = null; msg = ""; }
+    else if (isNaN(food) || isNaN(driver)) { state = null; msg = "Need the counter price and what the driver got to split it."; }
+    else if (food + driver > paid + 0.005) { state = null; msg = "Food plus driver pay is more than the customer paid. Double-check the numbers."; }
+    else {
+      state = {paid:paid, food:food, driver:driver, kept:paid - food - driver, miles:miles,
+               app:$("app").value, what:$("what").value.trim()};
+    }
+    $("msg").textContent = msg;
+    ["bSave","bShare","bText"].forEach(function(k){ $(k).disabled = !state; });
+    draw();
+  }
+
+  function draw(){
+    var W = 1080, H = 1080, P = 84;
+    ctx.fillStyle = "#0E1620"; ctx.fillRect(0, 0, W, H);
+
+    // header
+    ctx.fillStyle = "#FFB020";
+    ctx.font = "600 26px 'IBM Plex Mono', monospace";
+    ctx.textBaseline = "alphabetic";
+    ctx.fillText("ONE REAL ORDER" + (state && state.app !== "a delivery app" ? " · " + state.app.toUpperCase() : ""), P, P + 20);
+
+    ctx.fillStyle = "#E8EEF3";
+    ctx.font = "92px Anton, Impact, sans-serif";
+    ctx.fillText("WHERE THE", P, P + 140);
+    ctx.fillText("MONEY WENT", P, P + 240);
+
+    if (!state){
+      ctx.fillStyle = "#6F8494";
+      ctx.font = "500 34px 'IBM Plex Sans', sans-serif";
+      ctx.fillText("Fill in the order to build the card.", P, 560);
+      footer();
+      return;
+    }
+
+    if (state.what){
+      ctx.fillStyle = "#A3B4C1";
+      ctx.font = "500 32px 'IBM Plex Sans', sans-serif";
+      ctx.fillText(state.what, P, P + 300);
+    }
+
+    // bar
+    var bx = P, by = 450, bw = W - 2 * P, bh = 74;
+    var parts = [
+      {v: state.food,   c: "#4A5A68", label: "Food (counter price)"},
+      {v: state.driver, c: "#4FCB92", label: "Driver got"},
+      {v: state.kept,   c: "#FFB020", label: "The app kept"}
+    ];
+    var x = bx;
+    parts.forEach(function(p){
+      var w = bw * (p.v / state.paid);
+      ctx.fillStyle = p.c; ctx.fillRect(x, by, Math.max(w, 0), bh);
+      x += w;
+    });
+
+    // rows
+    var y = 640;
+    ctx.font = "500 38px 'IBM Plex Sans', sans-serif";
+    function row(label, val, color, big){
+      ctx.fillStyle = color; ctx.fillRect(P, y - 28, 22, 22);
+      ctx.fillStyle = big ? "#FFFFFF" : "#C9D5DE";
+      ctx.font = (big ? "600 " : "500 ") + "38px 'IBM Plex Sans', sans-serif";
+      ctx.fillText(label, P + 44, y);
+      ctx.font = "600 44px 'IBM Plex Mono', monospace";
+      var t = m(val), tw = ctx.measureText(t).width;
+      ctx.fillStyle = color === "#4A5A68" ? "#C9D5DE" : color;
+      ctx.fillText(t, W - P - tw, y + 2);
+      y += 72;
+    }
+    row("Customer paid", state.paid, "#E8EEF3", true);
+    row("Food at the counter", state.food, "#4A5A68");
+    row("Driver got" + (state.miles > 0 ? "  (" + state.miles.toFixed(1) + " mi)" : ""), state.driver, "#4FCB92");
+    row("The app kept", state.kept, "#FFB020", true);
+
+    footer();
+  }
+
+  function footer(){
+    ctx.fillStyle = "#6F8494";
+    ctx.font = "500 22px 'IBM Plex Sans', sans-serif";
+    ctx.fillText("“App kept” = paid − counter price − driver pay, before card fees. Self-reported, one order.", 84, 1010);
+    ctx.fillStyle = "#FFB020";
+    ctx.font = "28px Anton, Impact, sans-serif";
+    var t = "ZILCH", tw = ctx.measureText(t).width;
+    ctx.fillText(t, 1080 - 84 - tw, 1010 - 44);
+  }
+
+  function caption(){
+    if (!state) return "";
+    var pct = Math.round(state.kept / state.paid * 100);
+    return "One real order" + (state.app !== "a delivery app" ? " on " + state.app : "") + ". Customer paid " + m(state.paid) +
+      ". The same food is " + m(state.food) + " at the counter. The driver got " + m(state.driver) +
+      (state.miles > 0 ? " for " + state.miles.toFixed(1) + " miles" : "") + ". The app kept " + m(state.kept) + " (" + pct + "%).";
+  }
+
+  function blob(cb){ cv.toBlob(cb, "image/png"); }
+
+  $("bSave").addEventListener("click", function(){
+    blob(function(b){
+      var a = document.createElement("a");
+      a.href = URL.createObjectURL(b); a.download = "where-the-money-went.png";
+      document.body.appendChild(a); a.click(); a.remove();
+    });
+  });
+  if (navigator.canShare){
+    $("bShare").hidden = false;
+    $("bShare").addEventListener("click", function(){
+      blob(function(b){
+        var f = new File([b], "where-the-money-went.png", {type:"image/png"});
+        var data = {files:[f], text:caption()};
+        if (navigator.canShare(data)) navigator.share(data).catch(function(){});
+      });
+    });
+  }
+  $("bText").addEventListener("click", function(){
+    if (!navigator.clipboard) return;
+    navigator.clipboard.writeText(caption()).then(function(){
+      $("bText").textContent = "Copied";
+      setTimeout(function(){ $("bText").textContent = "Copy caption"; }, 1600);
+    });
+  });
+
+  ["paid","food","driver","miles","what","app"].forEach(function(k){
+    $(k).addEventListener("input", compute);
+  });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(draw);
+  compute();
+})();
+</script>
+</body>
+</html>

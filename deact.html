@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Deactivation Tracker — Zilch</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+  :root{
+    --paper:#EEF1F4; --surface:#FFFFFF; --surface-2:#E4E9EE;
+    --line:#C8D2DA; --line-soft:#DCE3E9;
+    --text:#0E1620; --text-2:#4A5A68; --text-3:#738796;
+    --accent:#FFB020; --accent-ink:#8A5300;
+    --ok:#1E8A5C; --warn:#A8402B; --warn-bg:#F7DFD8;
+    --shadow:0 1px 2px rgba(14,22,32,.05), 0 6px 18px -10px rgba(14,22,32,.16);
+    --radius:4px;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --paper:#0B1219; --surface:#121C26; --surface-2:#18242F;
+      --line:#2A3946; --line-soft:#1E2C38;
+      --text:#E8EEF3; --text-2:#A3B4C1; --text-3:#6F8494;
+      --accent:#FFB020; --accent-ink:#FFC65C;
+      --ok:#4FCB92; --warn:#E5806A; --warn-bg:#3A1E1A;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.7);
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#0B1219; --surface:#121C26; --surface-2:#18242F;
+    --line:#2A3946; --line-soft:#1E2C38;
+    --text:#E8EEF3; --text-2:#A3B4C1; --text-3:#6F8494;
+    --accent:#FFB020; --accent-ink:#FFC65C;
+    --ok:#4FCB92; --warn:#E5806A; --warn-bg:#3A1E1A;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.7);
+  }
+  *{box-sizing:border-box}
+  [hidden]{display:none!important}
+  body{margin:0;background:var(--paper);color:var(--text);
+    font-family:"IBM Plex Sans","Segoe UI",Helvetica,Arial,sans-serif;font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+  h1,h2,h3,p{margin:0}
+  .wrap{max-width:760px;margin:0 auto;padding:0 18px}
+  .eyebrow{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:10.5px;letter-spacing:.15em;text-transform:uppercase;font-weight:600;color:var(--text-3)}
+  .top{border-bottom:1px solid var(--line);background:var(--surface)}
+  .top-in{max-width:1180px;margin:0 auto;padding:12px 18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .wordmark{font-family:Anton,Impact,sans-serif;font-size:23px;letter-spacing:.02em;text-transform:uppercase;line-height:1;color:var(--text);text-decoration:none}
+  .wordmark span{color:var(--accent-ink)}
+  .sitenav{display:flex;gap:3px;align-items:center;flex-wrap:wrap}
+  .sitenav a{font-size:13px;font-weight:600;text-decoration:none;padding:7px 12px;color:var(--text-2);border:1px solid transparent;border-radius:3px}
+  .sitenav a:hover{color:var(--text);border-color:var(--line)}
+  .sitenav a[aria-current="page"]{color:var(--text);background:var(--surface-2);border-color:var(--line)}
+  .intro{padding:32px 0 22px}
+  .intro h1{font-family:Anton,Impact,sans-serif;text-transform:uppercase;font-size:clamp(32px,7vw,54px);line-height:.98;margin:12px 0 0}
+  .intro h1 em{font-style:normal;color:var(--warn)}
+  .intro p{margin-top:14px;max-width:58ch;font-size:16px;color:var(--text-2)}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;margin-bottom:16px}
+  .card h2{font-size:16px;font-weight:600;margin-bottom:3px}
+  .card .sub{font-size:13px;color:var(--text-3);margin-bottom:14px}
+
+  .headline{display:flex;gap:18px;align-items:baseline;flex-wrap:wrap}
+  .big{font-family:Anton,Impact,sans-serif;font-size:clamp(56px,14vw,96px);line-height:.9;color:var(--warn)}
+  .bigt{font-size:16px;color:var(--text-2);max-width:34ch}
+  .kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px;border-top:1px solid var(--line-soft);padding-top:14px}
+  @media (max-width:520px){ .kpis{grid-template-columns:1fr 1fr} }
+  .kpi .v{font-family:"IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums;font-size:22px;font-weight:600}
+  .kpi .k{font-size:12px;color:var(--text-3)}
+  .bars{display:flex;flex-direction:column;gap:9px}
+  .bar{display:grid;grid-template-columns:150px 1fr 44px;gap:10px;align-items:center;font-size:13.5px}
+  @media (max-width:520px){ .bar{grid-template-columns:110px 1fr 40px} }
+  .bar .track{height:12px;background:var(--surface-2);border-radius:2px;overflow:hidden}
+  .bar .fill{height:100%;background:var(--text-3)}
+  .bar.hot .fill{background:var(--warn)}
+  .bar .n{font-family:"IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums;text-align:right;color:var(--text-2)}
+  .empty{color:var(--text-3);font-size:14px}
+
+  label.fl{display:block;font-size:12.5px;font-weight:600;margin-bottom:5px;color:var(--text-2)}
+  input,select{font:inherit;font-size:16px;padding:9px 11px;width:100%;background:var(--surface);color:var(--text);border:1px solid var(--line);border-radius:var(--radius)}
+  input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid var(--accent-ink);outline-offset:1px}
+  .grid{display:grid;gap:14px;grid-template-columns:1fr 1fr}
+  @media (max-width:520px){ .grid{grid-template-columns:1fr} }
+  .go{font-family:Anton,Impact,sans-serif;text-transform:uppercase;letter-spacing:.045em;font-size:19px;padding:14px 22px;cursor:pointer;width:100%;margin-top:16px;
+    background:#0E1620;color:#F7FAFC;border:1px solid #0E1620;border-radius:var(--radius)}
+  :root[data-theme="dark"] .go{background:var(--accent);color:#0E1620;border-color:var(--accent)}
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .go{background:var(--accent);color:#0E1620;border-color:var(--accent)}}
+  .go:disabled{opacity:.4;cursor:default}
+  .msg{font-size:14px;color:var(--text-2);min-height:1.2em;margin-top:10px}
+  .note{font-size:13px;color:var(--text-3);line-height:1.55}
+  .note a{color:inherit}
+  footer{padding:26px 0 60px;color:var(--text-3);font-size:12.5px;line-height:1.6}
+  footer p{max-width:76ch;margin-bottom:8px}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="top-in">
+    <a class="wordmark" href="index.html">Zil<span>ch</span></a>
+    <nav class="sitenav">
+      <a href="index.html">The pitch</a>
+      <a href="find.html">Find a driver</a>
+      <a href="claim.html">Claim profile</a>
+      <a href="board.html">Board</a>
+      <a href="offer.html">Offer check</a>
+      <a href="receipt.html">Receipts</a>
+      <a href="deact.html" aria-current="page">Deactivations</a>
+      <a href="paycheck.html">Pay check</a>
+    </nav>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="intro">
+    <span class="eyebrow">Anonymous · drivers only</span>
+    <h1>Switched off. <em>No reason given.</em></h1>
+    <p>The apps don't publish how many drivers they deactivate or why. So drivers will. Report yours in thirty seconds, anonymously, and see what everyone else reported.</p>
+  </div>
+
+  <div class="card" id="stats">
+    <div class="headline">
+      <div class="big" id="pctNone">—</div>
+      <p class="bigt" id="pctNoneT">of reported deactivations came with no reason at all.</p>
+    </div>
+    <div class="kpis">
+      <div class="kpi"><div class="v" id="kTotal">0</div><div class="k">reports</div></div>
+      <div class="kpi"><div class="v" id="kWarned">—</div><div class="k">got any warning first</div></div>
+      <div class="kpi"><div class="v" id="kBack">—</div><div class="k">of appeals got reinstated</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>What they were told</h2>
+    <p class="sub">Reason given at deactivation, as reported.</p>
+    <div class="bars" id="byReason"><p class="empty">Loading&hellip;</p></div>
+  </div>
+
+  <div class="card">
+    <h2>By app</h2>
+    <div class="bars" id="byApp"><p class="empty">Loading&hellip;</p></div>
+  </div>
+
+  <div class="card" id="formCard">
+    <h2>Report yours</h2>
+    <p class="sub">No names, no free text, nothing that identifies you. Fixed choices only.</p>
+    <div class="grid">
+      <div>
+        <label class="fl" for="fApp">App</label>
+        <select id="fApp">
+          <option value="">Pick one</option>
+          <option>Uber</option><option>Lyft</option><option>DoorDash</option><option>Uber Eats</option>
+          <option>Grubhub</option><option>Instacart</option><option>Spark</option><option>Other</option>
+        </select>
+      </div>
+      <div>
+        <label class="fl" for="fWhen">When</label>
+        <input type="month" id="fWhen">
+      </div>
+      <div>
+        <label class="fl" for="fReason">Reason they gave</label>
+        <select id="fReason">
+          <option value="">Pick one</option>
+          <option value="none">No reason given</option>
+          <option value="ratings">Low ratings</option>
+          <option value="acceptance">Acceptance or completion rate</option>
+          <option value="fraud">"Fraud" or "suspicious activity"</option>
+          <option value="background">Background check</option>
+          <option value="safety">Safety report or complaint</option>
+          <option value="id_check">ID or photo check failed</option>
+          <option value="other">Something else</option>
+        </select>
+      </div>
+      <div>
+        <label class="fl" for="fArea">Area</label>
+        <select id="fArea">
+          <option value="">Rather not say</option>
+          <option value="minneapolis">Minneapolis</option><option value="stpaul">Saint Paul</option>
+          <option value="hopkins">Hopkins</option><option value="minnetonka">Minnetonka</option>
+          <option value="slp">St. Louis Park</option><option value="edenprairie">Eden Prairie</option>
+          <option value="plymouth">Plymouth</option><option value="waconia">Waconia</option>
+          <option value="other">Somewhere else</option>
+        </select>
+      </div>
+      <div>
+        <label class="fl" for="fWarned">Any warning first?</label>
+        <select id="fWarned"><option value="">Don't remember</option><option value="true">Yes</option><option value="false">No</option></select>
+      </div>
+      <div>
+        <label class="fl" for="fAppealed">Did you appeal?</label>
+        <select id="fAppealed"><option value="">Rather not say</option><option value="true">Yes</option><option value="false">No</option></select>
+      </div>
+      <div>
+        <label class="fl" for="fBack">Reinstated?</label>
+        <select id="fBack"><option value="">Rather not say</option><option value="yes">Yes</option><option value="no">No</option><option value="pending">Still waiting</option></select>
+      </div>
+      <div>
+        <label class="fl" for="fYears">Years on that app</label>
+        <input type="number" id="fYears" inputmode="decimal" min="0" max="20" step="0.5" placeholder="3">
+      </div>
+      <div>
+        <label class="fl" for="fTrips">Lifetime trips, roughly</label>
+        <input type="number" id="fTrips" inputmode="numeric" min="0" max="100000" step="1" placeholder="4200">
+      </div>
+    </div>
+    <button class="go" id="submit">Add my report</button>
+    <p class="msg" id="msg"></p>
+  </div>
+
+  <p class="note">In Minnesota, rideshare companies have to give a written notice with the reason for a deactivation and let you appeal (Minn. Stat. § 181C.04, in effect since late 2024). That law covers rideshare apps like Uber and Lyft, not food delivery. If you drive rideshare in Minnesota and got no reason, the Minnesota Department of Labor and Industry takes complaints. This page isn't legal advice.</p>
+</div>
+
+<footer class="wrap">
+  <p>Every report is self-reported and anonymous, and the numbers here are a count of reports, not a survey. One report per browser. Zilch isn't affiliated with any app.</p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script>
+(function(){
+  "use strict";
+  var $ = function(id){ return document.getElementById(id); };
+  var sb = window.supabase.createClient("https://zlvvtaydmaphdnhvmppj.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpsdnZ0YXlkbWFwaGRuaHZtcHBqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg5NzE3MTEsImV4cCI6MjEwNDU0NzcxMX0.t5ILb0-k3auW1Z3Em-gdR11rHURl5N-SVic9q1YDG7k");
+
+  var REASONS = {none:"No reason given", ratings:"Low ratings", acceptance:"Acceptance rate", fraud:"“Fraud”",
+    background:"Background check", safety:"Safety report", id_check:"ID check", other:"Something else"};
+  var DONE_KEY = "zilch.deact.v1";
+  var done = false;
+  try { done = localStorage.getItem(DONE_KEY) === "1"; } catch(e){}
+
+  function esc(s){ return String(s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+  function pct(a, b){ return b ? Math.round(a / b * 100) + "%" : "—"; }
+
+  function bars(el, counts, labels, hotKey){
+    var keys = Object.keys(counts).sort(function(a, b){ return counts[b] - counts[a]; });
+    var max = keys.length ? counts[keys[0]] : 0;
+    if (!keys.length){ el.innerHTML = '<p class="empty">No reports yet. Be the first.</p>'; return; }
+    el.innerHTML = keys.map(function(k){
+      return '<div class="bar' + (k === hotKey ? " hot" : "") + '"><span>' + esc(labels ? labels[k] || k : k) + '</span>' +
+        '<div class="track"><div class="fill" style="width:' + (counts[k] / max * 100) + '%"></div></div>' +
+        '<span class="n">' + counts[k] + '</span></div>';
+    }).join("");
+  }
+
+  async function load(){
+    var res = await sb.from("deactivations").select("platform,reason,warned,appealed,reinstated");
+    if (res.error){ $("byReason").innerHTML = '<p class="empty">Can’t reach the live count right now.</p>'; return; }
+    var rows = res.data || [];
+    var byR = {}, byA = {}, none = 0, wKnown = 0, warned = 0, appeals = 0, back = 0;
+    rows.forEach(function(r){
+      byR[r.reason] = (byR[r.reason] || 0) + 1;
+      byA[r.platform] = (byA[r.platform] || 0) + 1;
+      if (r.reason === "none") none++;
+      if (r.warned !== null){ wKnown++; if (r.warned) warned++; }
+      if (r.appealed && (r.reinstated === "yes" || r.reinstated === "no")){ appeals++; if (r.reinstated === "yes") back++; }
+    });
+    $("kTotal").textContent = rows.length.toLocaleString("en-US");
+    $("pctNone").textContent = rows.length ? pct(none, rows.length) : "—";
+    $("pctNoneT").textContent = rows.length
+      ? "of " + rows.length + " reported deactivation" + (rows.length === 1 ? "" : "s") + " came with no reason at all."
+      : "No reports yet. Yours could be the first.";
+    $("kWarned").textContent = pct(warned, wKnown);
+    $("kBack").textContent = pct(back, appeals);
+    bars($("byReason"), byR, REASONS, "none");
+    bars($("byApp"), byA, null, null);
+  }
+
+  if (done){ $("submit").disabled = true; $("msg").textContent = "You've already reported from this browser. Thanks."; }
+
+  $("submit").addEventListener("click", async function(){
+    if (done) return;
+    var app = $("fApp").value, when = $("fWhen").value, reason = $("fReason").value;
+    if (!app || !reason){ $("msg").textContent = "Pick the app and the reason they gave."; return; }
+    if (!/^20\d\d-(0[1-9]|1[0-2])$/.test(when)){ $("msg").textContent = "Pick the month it happened."; return; }
+    var b = function(id){ var v = $(id).value; return v === "" ? null : v === "true"; };
+    var years = parseFloat($("fYears").value), trips = parseInt($("fTrips").value, 10);
+    var body = {
+      platform: app, happened: when, reason: reason,
+      area: $("fArea").value || null,
+      warned: b("fWarned"), appealed: b("fAppealed"),
+      reinstated: $("fBack").value || null,
+      years: isFinite(years) && years >= 0 && years <= 20 ? years : null,
+      trips: isFinite(trips) && trips >= 0 && trips <= 100000 ? trips : null
+    };
+    $("submit").disabled = true; $("msg").textContent = "Adding…";
+    var res = await sb.from("deactivations").insert(body);
+    if (res.error){ $("msg").textContent = "That didn't save. Try again in a moment."; $("submit").disabled = false; return; }
+    done = true;
+    try { localStorage.setItem(DONE_KEY, "1"); } catch(e){}
+    $("msg").textContent = "Added. Send this page to other drivers who got switched off.";
+    load();
+  });
+
+  load();
+  sb.channel("deact-live")
+    .on("postgres_changes", {event:"INSERT", schema:"public", table:"deactivations"}, load)
+    .subscribe();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,343 @@
+<title>Zilch</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+  :root{
+    --paper:#EEF1F4;
+    --surface:#FFFFFF;
+    --surface-2:#E4E9EE;
+    --line:#C8D2DA;
+    --line-soft:#DCE3E9;
+    --text:#0E1620;
+    --text-2:#4A5A68;
+    --text-3:#738796;
+    --accent:#FFB020;
+    --accent-ink:#8A5300;
+    --ice:#2F6F9E;
+    --ice-bg:#DCEAF5;
+    --loss:#A8402B;
+    --loss-fill:#C8553D;
+    --shadow:0 1px 2px rgba(14,22,32,.06), 0 8px 24px -12px rgba(14,22,32,.18);
+    --radius:3px;
+    --maxw:1120px;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --paper:#0B1219;
+      --surface:#121C26;
+      --surface-2:#18242F;
+      --line:#2A3946;
+      --line-soft:#1E2C38;
+      --text:#E8EEF3;
+      --text-2:#A3B4C1;
+      --text-3:#6F8494;
+      --accent:#FFB020;
+      --accent-ink:#FFC65C;
+      --ice:#8FC9E8;
+      --ice-bg:#16303F;
+      --loss:#E5806A;
+      --loss-fill:#C8553D;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 30px -14px rgba(0,0,0,.7);
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#0B1219;
+    --surface:#121C26;
+    --surface-2:#18242F;
+    --line:#2A3946;
+    --line-soft:#1E2C38;
+    --text:#E8EEF3;
+    --text-2:#A3B4C1;
+    --text-3:#6F8494;
+    --accent:#FFB020;
+    --accent-ink:#FFC65C;
+    --ice:#8FC9E8;
+    --ice-bg:#16303F;
+    --loss:#E5806A;
+    --loss-fill:#C8553D;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 30px -14px rgba(0,0,0,.7);
+  }
+
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--text);
+    font-family:"IBM Plex Sans","Segoe UI",Helvetica,Arial,sans-serif;
+    font-size:16px;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:var(--maxw);margin:0 auto;padding-left:24px;padding-right:24px}
+  h1,h2,h3{margin:0;text-wrap:balance}
+  p{margin:0}
+  a{color:inherit}
+  .mono{font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums}
+  .eyebrow{
+    font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+    font-weight:600;color:var(--text-3);
+    font-family:"IBM Plex Mono",ui-monospace,monospace;
+  }
+
+  /* masthead */
+  .masthead{border-bottom:1px solid var(--line);background:var(--surface)}
+  .masthead-in{
+    max-width:var(--maxw);margin:0 auto;padding:14px 24px;
+    display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
+  }
+  .wordmark{
+    font-family:Anton,Impact,"Arial Narrow Bold",sans-serif;
+    font-size:26px;letter-spacing:.02em;line-height:1;text-transform:uppercase;
+  }
+  .wordmark span{color:var(--accent-ink)}
+  .sitenav{display:flex;gap:4px;align-items:center;flex-wrap:wrap}
+  .sitenav a{
+    font-size:13px;font-weight:600;text-decoration:none;padding:7px 13px;
+    color:var(--text-2);border:1px solid transparent;border-radius:3px;
+  }
+  .sitenav a:hover{color:var(--text);border-color:var(--line)}
+  .sitenav a[aria-current="page"]{color:var(--text);background:var(--surface-2);border-color:var(--line)}
+  .sitenav a:focus-visible{outline:2px solid var(--accent-ink);outline-offset:2px}
+  .status{
+    display:inline-flex;align-items:center;gap:8px;
+    font-size:12px;color:var(--text-2);
+    font-family:"IBM Plex Mono",ui-monospace,monospace;
+  }
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);flex:none}
+
+  /* hero */
+  .hero{padding-block:74px 58px;border-bottom:1px solid var(--line)}
+  .hero h1{
+    font-family:Anton,Impact,sans-serif;
+    text-transform:uppercase;
+    font-size:clamp(44px,8.8vw,108px);
+    line-height:.93;
+    letter-spacing:.005em;
+    margin-top:18px;
+  }
+  .hero h1 .strike{position:relative;white-space:nowrap}
+  .hero h1 .strike::after{
+    content:"";position:absolute;left:-.02em;right:-.02em;top:.54em;height:.075em;
+    background:var(--loss-fill);transform:rotate(-2.2deg);
+  }
+  .hero h1 em{font-style:normal;color:var(--accent-ink)}
+  .hero-sub{
+    margin-top:26px;max-width:58ch;font-size:19px;line-height:1.5;color:var(--text-2);
+  }
+  .hero-sub strong{color:var(--text);font-weight:600}
+  .herocta{display:flex;gap:12px;flex-wrap:wrap;margin-top:32px}
+  .btn{
+    font-family:Anton,Impact,sans-serif;text-transform:uppercase;letter-spacing:.045em;
+    font-size:18px;padding:14px 26px;text-decoration:none;display:inline-block;
+    border-radius:var(--radius);border:1px solid #0E1620;background:#0E1620;color:#F7FAFC;
+  }
+  :root[data-theme="dark"] .btn{background:var(--accent);color:#0E1620;border-color:var(--accent)}
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]) .btn{background:var(--accent);color:#0E1620;border-color:var(--accent)}
+  }
+  .btn:hover{opacity:.88}
+  .btn.ghost{background:transparent;color:var(--text);border-color:var(--line)}
+  :root[data-theme="dark"] .btn.ghost{background:transparent;color:var(--text);border-color:var(--line)}
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]) .btn.ghost{background:transparent;color:var(--text);border-color:var(--line)}
+  }
+  .btn.ghost:hover{border-color:var(--text-3);opacity:1}
+  .btn:focus-visible{outline:2px solid var(--accent-ink);outline-offset:3px}
+
+  /* sections */
+  section{padding-block:64px;border-bottom:1px solid var(--line)}
+  .sec-head{margin-bottom:34px}
+  .sec-head h2{
+    font-family:Anton,Impact,sans-serif;text-transform:uppercase;
+    font-size:clamp(28px,4.2vw,44px);line-height:1;margin-top:10px;
+  }
+  .sec-head p{margin-top:14px;max-width:62ch;color:var(--text-2)}
+
+  /* steps */
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+  @media (max-width:800px){ .steps{grid-template-columns:1fr} }
+  .step{
+    background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);
+    padding:26px 24px;display:flex;flex-direction:column;gap:10px;
+  }
+  .step .n{
+    font-family:"IBM Plex Mono",ui-monospace,monospace;
+    font-size:11px;letter-spacing:.16em;font-weight:600;color:var(--accent-ink);
+  }
+  .step h3{font-size:20px;font-weight:600;line-height:1.25}
+  .step p{color:var(--text-2);font-size:15px;line-height:1.55}
+
+  /* the problem */
+  .facts{display:grid;grid-template-columns:repeat(3,1fr);gap:28px}
+  @media (max-width:860px){ .facts{grid-template-columns:1fr;gap:22px} }
+  .fact{padding-left:16px;border-left:3px solid var(--accent)}
+  .fact.alt{border-left-color:var(--ice)}
+  .fact h3{font-size:17px;font-weight:700;margin-bottom:7px}
+  .fact p{color:var(--text-2);font-size:15px;line-height:1.55}
+
+  /* pay strip */
+  .paystrip{
+    background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);
+    padding:30px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:26px;align-items:center;
+  }
+  @media (max-width:760px){ .paystrip{grid-template-columns:1fr;gap:20px} }
+  .paystrip h3{
+    font-family:Anton,Impact,sans-serif;text-transform:uppercase;
+    font-size:clamp(23px,3.4vw,32px);line-height:1.02;margin-bottom:12px;
+  }
+  .paystrip p{color:var(--text-2);font-size:15.5px;max-width:56ch}
+  .rates{
+    display:flex;gap:26px;flex-wrap:wrap;margin-top:18px;
+    font-family:"IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums;
+  }
+  .rates div .v{font-size:21px;font-weight:600;line-height:1}
+  .rates div .k{font-size:11px;color:var(--text-3);margin-top:5px;letter-spacing:.06em;text-transform:uppercase}
+
+  /* cta cards */
+  .ctarow{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media (max-width:760px){ .ctarow{grid-template-columns:1fr} }
+  .ctacard{
+    display:flex;flex-direction:column;gap:9px;padding:24px;text-decoration:none;
+    background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--accent);
+    box-shadow:var(--shadow);
+  }
+  .ctacard.alt{border-left-color:var(--ice)}
+  .ctacard:hover{border-color:var(--text-3);border-left-color:var(--accent)}
+  .ctacard.alt:hover{border-left-color:var(--ice)}
+  .ctacard:focus-visible{outline:2px solid var(--accent-ink);outline-offset:3px}
+  .ctak{font-family:Anton,Impact,sans-serif;text-transform:uppercase;font-size:23px;line-height:1.05}
+  .ctad{color:var(--text-2);font-size:15px;line-height:1.5}
+  .ctago{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.09em;
+    text-transform:uppercase;font-weight:600;color:var(--accent-ink);margin-top:4px}
+
+  footer{padding-block:44px 64px;color:var(--text-3);font-size:13.5px}
+  footer p{max-width:78ch;margin-bottom:10px;line-height:1.6}
+  footer .disclaim{border-left:2px solid var(--accent);padding-left:14px;color:var(--text-2)}
+
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<header class="masthead">
+  <div class="masthead-in">
+    <div class="wordmark">Zil<span>ch</span></div>
+    <nav class="sitenav">
+      <a href="index.html" aria-current="page">The pitch</a>
+      <a href="find.html">Find a driver</a>
+      <a href="claim.html">Claim profile</a>
+      <a href="board.html">Board</a>
+      <a href="offer.html">Offer check</a>
+      <a href="receipt.html">Receipts</a>
+      <a href="deact.html">Deactivations</a>
+      <a href="paycheck.html">Pay check</a>
+    </nav>
+    <div class="status"><span class="dot" aria-hidden="true"></span>West metro &middot; Minnesota</div>
+  </div>
+</header>
+
+<main>
+  <div class="hero wrap">
+    <span class="eyebrow">Portable driver reputation</span>
+    <h1>Six thousand trips.<br><span class="strike">None of them</span> <em>yours</em>.</h1>
+    <p class="hero-sub">Your rating is the most valuable thing you own and you can't take it anywhere. It sits inside an app you don't control and it's gone the morning they deactivate you. <strong>Build a record that's actually yours.</strong></p>
+    <div class="herocta">
+      <a class="btn" href="claim.html">Claim your profile</a>
+      <a class="btn ghost" href="find.html">Find a driver</a>
+    </div>
+  </div>
+
+  <section class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">How it works</span>
+      <h2>Three steps, then it's yours</h2>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <span class="n">STEP 01</span>
+        <h3>Build it once</h3>
+        <p>Your trips, your rating, your car, your area. Attach a screenshot of your stats screen and the profile shows as verified. Takes about two minutes.</p>
+      </div>
+      <div class="step">
+        <span class="n">STEP 02</span>
+        <h3>Hand it out</h3>
+        <p>A permanent link, a QR code for the seatback, a printable card, or save straight into a rider's contacts. However you want to give it out, it's there.</p>
+      </div>
+      <div class="step">
+        <span class="n">STEP 03</span>
+        <h3>Get found directly</h3>
+        <p>Riders look you up and reach you themselves. You set the price, you keep all of it, and nobody takes a percentage for making the introduction.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Why this matters</span>
+      <h2>Your reputation is the product they're selling</h2>
+      <p>Uber's fee isn't payment for an app. It's payment for being the only one who knows you're good at this.</p>
+    </div>
+    <div class="facts">
+      <div class="fact">
+        <h3>It doesn't transfer</h3>
+        <p>Four years of five-star ratings is worth nothing the moment you open a different app. That isn't a technical limitation — it's the entire retention strategy.</p>
+      </div>
+      <div class="fact alt">
+        <h3>It vanishes on deactivation</h3>
+        <p>An algorithm decides, there's often no appeal, and everything you built is gone with it. A record you hold a copy of can't be switched off.</p>
+      </div>
+      <div class="fact">
+        <h3>It costs you 30% forever</h3>
+        <p>As long as they're the only place your history exists, the cut is whatever they say it is. A rider who can find you directly changes that number to zero.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap">
+    <div class="paystrip">
+      <div>
+        <h3>On shift right now? Check the offer first.</h3>
+        <p>The app shows the payout, not what the trip costs your car or the empty miles back. Punch in the offer and get Take it, Maybe or Skip, based on your own car and your own floor, before the timer runs out.</p>
+      </div>
+      <a class="btn" href="offer.html">Check an offer</a>
+    </div>
+  </section>
+
+  <section class="wrap">
+    <div class="paystrip">
+      <div>
+        <h3>While you're here — were you paid legally?</h3>
+        <p>Minnesota sets a floor on rideshare pay per passenger mile and minute. So do Washington and New York City. Run one pay period against it and find out whether you were short, and who to file with if you were.</p>
+        <div class="rates">
+          <div><div class="v">$1.28</div><div class="k">per mile</div></div>
+          <div><div class="v">$0.31</div><div class="k">per minute</div></div>
+          <div><div class="v">$5.00</div><div class="k">per trip floor</div></div>
+        </div>
+      </div>
+      <a class="btn" href="paycheck.html">Check a pay period</a>
+    </div>
+  </section>
+
+  <section class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Also here</span>
+      <h2>Two more things</h2>
+    </div>
+    <div class="ctarow">
+      <a class="ctacard" href="board.html">
+        <span class="ctak">The job board</span>
+        <span class="ctad">Someone needs a ride or a delivery, names a price, and a driver claims it. No commission, no surge split — the offer goes to whoever does the work.</span>
+        <span class="ctago">Open the board &rarr;</span>
+      </a>
+      <a class="ctacard alt" href="pledge.html">
+        <span class="ctak">Pledge your area</span>
+        <span class="ctad">Say where you'd drive. Nothing turns on in a suburb until enough drivers there commit, so the first night is never four people and an empty map.</span>
+        <span class="ctago">Add your name &rarr;</span>
+      </a>
+    </div>
+  </section>
+</main>
+
+<footer class="wrap">
+  <p class="disclaim"><strong>Zilch takes no commission and arranges no rides.</strong> Profiles are created and owned by drivers. Anything you agree with a driver is between the two of you.</p>
+  <p>Pay figures from Minn. Stat. § 181C.03, RCW 49.46.300 and 35 RCNY § 59B-23. Rates change — verify before relying on any of it. This is not legal advice. The whole thing is open source; run your own copy anywhere.</p>
+</footer>

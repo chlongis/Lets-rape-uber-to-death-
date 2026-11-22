@@ -1,0 +1,720 @@
+<title>Zilch Board</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+  :root{
+    --paper:#EEF1F4;
+    --surface:#FFFFFF;
+    --surface-2:#E4E9EE;
+    --line:#C8D2DA;
+    --line-soft:#DCE3E9;
+    --text:#0E1620;
+    --text-2:#4A5A68;
+    --text-3:#738796;
+    --accent:#FFB020;
+    --accent-ink:#8A5300;
+    --ride:#2F6F9E;
+    --ride-bg:#DCEAF5;
+    --food:#A0522A;
+    --food-bg:#F6E6DA;
+    --open:#1E8A5C;
+    --open-bg:#D8F0E4;
+    --claimed:#6B7C8C;
+    --claimed-bg:#E3E9ED;
+    --shadow:0 1px 2px rgba(14,22,32,.05), 0 6px 18px -10px rgba(14,22,32,.16);
+    --radius:4px;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --paper:#0B1219; --surface:#121C26; --surface-2:#18242F;
+      --line:#2A3946; --line-soft:#1E2C38;
+      --text:#E8EEF3; --text-2:#A3B4C1; --text-3:#6F8494;
+      --accent:#FFB020; --accent-ink:#FFC65C;
+      --ride:#8FC9E8; --ride-bg:#16303F;
+      --food:#E0A075; --food-bg:#3A2618;
+      --open:#4FCB92; --open-bg:#123528;
+      --claimed:#8DA0AF; --claimed-bg:#1C2831;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.7);
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#0B1219; --surface:#121C26; --surface-2:#18242F;
+    --line:#2A3946; --line-soft:#1E2C38;
+    --text:#E8EEF3; --text-2:#A3B4C1; --text-3:#6F8494;
+    --accent:#FFB020; --accent-ink:#FFC65C;
+    --ride:#8FC9E8; --ride-bg:#16303F;
+    --food:#E0A075; --food-bg:#3A2618;
+    --open:#4FCB92; --open-bg:#123528;
+    --claimed:#8DA0AF; --claimed-bg:#1C2831;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.7);
+  }
+
+  *{box-sizing:border-box}
+  [hidden]{display:none!important}
+  body{
+    background:var(--paper);color:var(--text);
+    font-family:"IBM Plex Sans","Segoe UI",Helvetica,Arial,sans-serif;
+    font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{margin:0}
+  p{margin:0}
+  .mono{font-family:"IBM Plex Mono",ui-monospace,Menlo,monospace;font-variant-numeric:tabular-nums}
+  .eyebrow{
+    font-family:"IBM Plex Mono",ui-monospace,monospace;
+    font-size:10.5px;letter-spacing:.15em;text-transform:uppercase;
+    font-weight:600;color:var(--text-3);
+  }
+
+  /* topbar */
+  .top{border-bottom:1px solid var(--line);background:var(--surface);position:sticky;top:0;z-index:20}
+  .top-in{
+    max-width:1180px;margin:0 auto;padding:12px 22px;
+    display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;
+  }
+  .brand{display:flex;align-items:baseline;gap:11px}
+  .wordmark{
+    font-family:Anton,Impact,sans-serif;font-size:23px;letter-spacing:.02em;
+    text-transform:uppercase;line-height:1;
+  }
+  .wordmark span{color:var(--accent-ink)}
+  .brandsub{font-size:12.5px;color:var(--text-3)}
+  .sitenav{display:flex;gap:3px;align-items:center;flex-wrap:wrap}
+  .sitenav a{
+    font-size:13px;font-weight:600;text-decoration:none;padding:7px 12px;
+    color:var(--text-2);border:1px solid transparent;border-radius:3px;
+  }
+  .sitenav a:hover{color:var(--text);border-color:var(--line)}
+  .sitenav a[aria-current="page"]{color:var(--text);background:var(--surface-2);border-color:var(--line)}
+  .sitenav a:focus-visible{outline:2px solid var(--accent-ink);outline-offset:2px}
+  .modes{display:flex;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+  .modes button{
+    font:inherit;font-size:13.5px;font-weight:600;padding:8px 16px;cursor:pointer;
+    background:var(--surface);color:var(--text-2);border:0;border-left:1px solid var(--line);
+  }
+  .modes button:first-child{border-left:0}
+  .modes button[aria-pressed="true"]{background:var(--accent);color:#0E1620}
+  .modes button:focus-visible{outline:2px solid var(--accent-ink);outline-offset:-2px}
+
+  .shell{max-width:1180px;margin:0 auto;padding:24px 22px 64px;display:grid;grid-template-columns:340px minmax(0,1fr);gap:24px;align-items:start}
+  @media (max-width:900px){ .shell{grid-template-columns:1fr} }
+
+  /* panel */
+  .panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+  .panel-head{padding:16px 18px;border-bottom:1px solid var(--line-soft)}
+  .panel-head h2{font-size:16px;font-weight:600;margin-top:5px}
+  .panel-head p{font-size:13px;color:var(--text-3);margin-top:5px}
+  .panel-body{padding:18px;display:flex;flex-direction:column;gap:15px}
+
+  label.fl{display:block;font-size:12.5px;font-weight:600;margin-bottom:6px}
+  input[type=text],input[type=number],select,textarea{
+    font:inherit;font-size:14.5px;padding:9px 11px;width:100%;
+    background:var(--surface);color:var(--text);
+    border:1px solid var(--line);border-radius:var(--radius);
+  }
+  textarea{resize:vertical;min-height:62px}
+  input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--accent-ink);outline-offset:1px}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .kindpick{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .kindpick button{
+    font:inherit;font-size:14px;font-weight:600;padding:11px 8px;cursor:pointer;
+    background:var(--surface);color:var(--text-2);
+    border:1px solid var(--line);border-radius:var(--radius);
+  }
+  .kindpick button[aria-pressed="true"][data-k="ride"]{background:var(--ride-bg);border-color:var(--ride);color:var(--ride)}
+  .kindpick button[aria-pressed="true"][data-k="delivery"]{background:var(--food-bg);border-color:var(--food);color:var(--food)}
+  .kindpick button:focus-visible{outline:2px solid var(--accent-ink);outline-offset:2px}
+
+  .go{
+    font-family:Anton,Impact,sans-serif;text-transform:uppercase;letter-spacing:.045em;
+    font-size:17px;padding:12px 20px;cursor:pointer;width:100%;
+    background:#0E1620;color:#F7FAFC;border:1px solid #0E1620;border-radius:var(--radius);
+  }
+  :root[data-theme="dark"] .go{background:var(--accent);color:#0E1620;border-color:var(--accent)}
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]) .go{background:var(--accent);color:#0E1620;border-color:var(--accent)}
+  }
+  .go:hover{opacity:.88}
+  .go:disabled{opacity:.4;cursor:default}
+  .go:focus-visible{outline:2px solid var(--accent-ink);outline-offset:3px}
+  .note{font-size:12.5px;color:var(--text-3);line-height:1.5}
+  .err{font-size:13px;color:#C8553D;min-height:1.2em}
+
+  /* board */
+  .boardhead{
+    display:flex;align-items:baseline;justify-content:space-between;gap:14px;
+    flex-wrap:wrap;margin-bottom:14px;
+  }
+  .boardhead h2{font-family:Anton,Impact,sans-serif;text-transform:uppercase;font-size:27px;line-height:1}
+  .filters{display:flex;gap:8px;flex-wrap:wrap}
+  .filters button{
+    font:inherit;font-size:12.5px;font-weight:600;padding:6px 12px;cursor:pointer;
+    background:var(--surface);color:var(--text-2);
+    border:1px solid var(--line);border-radius:99px;
+  }
+  .filters button[aria-pressed="true"]{background:var(--text);color:var(--paper);border-color:var(--text)}
+  .filters button:focus-visible{outline:2px solid var(--accent-ink);outline-offset:2px}
+
+  .list{display:flex;flex-direction:column;gap:10px}
+  .card{
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+    padding:15px 17px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;align-items:start;
+  }
+  .card.claimed{opacity:.72}
+  .card-main{min-width:0}
+  .tags{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin-bottom:9px}
+  .tag{
+    font-family:"IBM Plex Mono",ui-monospace,monospace;
+    font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;font-weight:600;
+    padding:3px 8px;border-radius:3px;
+  }
+  .t-ride{background:var(--ride-bg);color:var(--ride)}
+  .t-food{background:var(--food-bg);color:var(--food)}
+  .t-open{background:var(--open-bg);color:var(--open)}
+  .t-claimed{background:var(--claimed-bg);color:var(--claimed)}
+  .route{font-size:16px;font-weight:600;line-height:1.35;overflow-wrap:anywhere}
+  .route .arrow{color:var(--text-3);font-weight:400;padding:0 5px}
+  .meta{font-size:13px;color:var(--text-2);margin-top:6px;overflow-wrap:anywhere}
+  .meta .sep{color:var(--line);padding:0 6px}
+  .notes{font-size:13.5px;color:var(--text-2);margin-top:8px;overflow-wrap:anywhere}
+  .card-side{display:flex;flex-direction:column;align-items:flex-end;gap:9px;text-align:right}
+  .offer{
+    font-family:"IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums;
+    font-size:23px;font-weight:600;line-height:1;white-space:nowrap;
+  }
+  .offer small{display:block;font-family:"IBM Plex Sans",sans-serif;font-size:10.5px;font-weight:600;
+    letter-spacing:.09em;text-transform:uppercase;color:var(--open);margin-top:5px}
+  .claim{
+    font:inherit;font-size:13.5px;font-weight:600;padding:8px 15px;cursor:pointer;white-space:nowrap;
+    background:var(--accent);color:#0E1620;border:1px solid var(--accent);border-radius:var(--radius);
+  }
+  .claim:hover{opacity:.87}
+  .claim:disabled{background:var(--surface-2);color:var(--text-3);border-color:var(--line);cursor:default}
+  .claim:focus-visible{outline:2px solid var(--accent-ink);outline-offset:2px}
+  .claimedby{font-size:12.5px;color:var(--text-3);max-width:150px}
+
+  .areabar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:14px;
+    padding:12px 14px;background:var(--surface-2);border:1px solid var(--line-soft);border-radius:var(--radius)}
+  .contact-reveal{
+    margin-top:7px;padding:9px 11px;
+    background:var(--open-bg);border:1px solid var(--open);border-radius:var(--radius);
+    font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:13px;color:var(--open);
+    word-break:break-all;
+  }
+  .contact-label{font-size:11px;letter-spacing:.09em;text-transform:uppercase;font-weight:600;
+    margin-bottom:4px;display:block;color:var(--open)}
+  .area-tag{font-size:10.5px;padding:2px 7px;border-radius:3px;
+    background:var(--surface-2);color:var(--text-3);border:1px solid var(--line-soft);
+    font-family:"IBM Plex Mono",ui-monospace,monospace;letter-spacing:.07em;text-transform:uppercase;font-weight:600}
+
+  .empty{
+    background:var(--surface);border:1px dashed var(--line);border-radius:var(--radius);
+    padding:38px 24px;text-align:center;color:var(--text-2);
+  }
+  .empty strong{display:block;font-size:16px;color:var(--text);margin-bottom:7px}
+
+  .banner{
+    max-width:1180px;margin:0 auto;padding:11px 22px;
+    background:var(--surface-2);border-bottom:1px solid var(--line);
+    font-size:12.5px;color:var(--text-2);
+  }
+  .banner b{color:var(--text)}
+  footer{max-width:1180px;margin:0 auto;padding:0 22px 56px;color:var(--text-3);font-size:12.5px;line-height:1.6}
+  footer p{max-width:80ch;margin-bottom:9px}
+  /* insurance gate */
+  .overlay{position:fixed;inset:0;background:rgba(14,22,32,.72);z-index:100;display:flex;align-items:center;justify-content:center;padding:20px}
+  .gate{
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:0 12px 48px rgba(0,0,0,.35);max-width:480px;width:100%;padding:32px 28px;
+  }
+  .gate h2{font-family:Anton,Impact,sans-serif;text-transform:uppercase;font-size:28px;line-height:1.05;margin-bottom:14px}
+  .gate p{font-size:15px;color:var(--text-2);margin-bottom:16px;line-height:1.55}
+  .upload-zone{
+    border:2px dashed var(--line);border-radius:var(--radius);padding:28px 20px;text-align:center;
+    margin-bottom:12px;cursor:pointer;position:relative;
+  }
+  .upload-zone:hover{border-color:var(--text-3)}
+  .upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
+  .upload-zone .uz-label{font-size:15px;font-weight:600;color:var(--text)}
+  .upload-zone .uz-sub{font-size:13px;color:var(--text-3);margin-top:5px}
+  .upload-zone.has-file{border-color:var(--open);background:var(--open-bg)}
+  .upload-zone.has-file .uz-label{color:var(--open)}
+  .gate-go{
+    font:inherit;font-size:16px;font-weight:600;padding:13px 24px;cursor:pointer;width:100%;
+    background:#0E1620;color:#F7FAFC;border:1px solid #0E1620;border-radius:var(--radius);
+    margin-bottom:12px;
+  }
+  :root[data-theme="dark"] .gate-go{background:var(--open);color:#0F1512;border-color:var(--open)}
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .gate-go{background:var(--open);color:#0F1512;border-color:var(--open)}}
+  .gate-go:hover{opacity:.88}
+  .gate-go:disabled{opacity:.4;cursor:default}
+  .gate-skip{
+    font:inherit;font-size:15px;font-weight:700;padding:14px 24px;cursor:pointer;width:100%;
+    background:#C8553D;color:#fff;border:2px solid #C8553D;border-radius:var(--radius);
+    text-transform:uppercase;letter-spacing:.04em;
+  }
+  .gate-skip:hover{background:#A8402B;border-color:#A8402B}
+  .gate-msg{font-size:13px;color:var(--text-3);text-align:center;margin-top:10px}
+
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div class="top">
+  <div class="top-in">
+    <div class="brand">
+      <span class="wordmark">Zil<span>ch</span></span>
+      <nav class="sitenav">
+        <a href="index.html">The pitch</a>
+        <a href="find.html">Find a driver</a>
+        <a href="claim.html">Claim profile</a>
+        <a href="board.html" aria-current="page">Board</a>
+        <a href="offer.html">Offer check</a>
+        <a href="receipt.html">Receipts</a>
+        <a href="deact.html">Deactivations</a>
+        <a href="paycheck.html">Pay check</a>
+      </nav>
+    </div>
+    <div class="modes" role="group" aria-label="Switch between posting and driving">
+      <button type="button" id="mNeed" aria-pressed="true">I need something</button>
+      <button type="button" id="mDrive" aria-pressed="false">I'm driving</button>
+    </div>
+  </div>
+</div>
+
+<div class="banner">
+  <b>Working prototype.</b> Post and claim to see how it behaves. Don't arrange real trips through it — no identity checks, no insurance, no payments yet.
+</div>
+
+<div class="shell">
+  <div class="panel" id="postPanel">
+    <div class="panel-head">
+      <span class="eyebrow">Post a job</span>
+      <h2>What do you need moved?</h2>
+      <p>A person or a thing. You name the price, the driver keeps it.</p>
+    </div>
+    <div class="panel-body">
+      <div>
+        <span class="eyebrow" style="display:block;margin-bottom:8px">Type</span>
+        <div class="kindpick" role="group" aria-label="Ride or delivery">
+          <button type="button" data-k="ride" id="kRide" aria-pressed="true">Ride</button>
+          <button type="button" data-k="delivery" id="kFood" aria-pressed="false">Delivery</button>
+        </div>
+      </div>
+
+      <div>
+        <label class="fl" for="fName">Your first name</label>
+        <input type="text" id="fName" maxlength="24" placeholder="First name" autocomplete="off">
+      </div>
+
+      <div>
+        <label class="fl" for="fFrom">Pick up at</label>
+        <input type="text" id="fFrom" maxlength="70" placeholder="Ridgedale Center, Minnetonka" autocomplete="off">
+      </div>
+
+      <div>
+        <label class="fl" for="fTo">Drop off at</label>
+        <input type="text" id="fTo" maxlength="70" placeholder="Hopkins station" autocomplete="off">
+      </div>
+
+      <div class="two">
+        <div>
+          <label class="fl" for="fWhen">When</label>
+          <select id="fWhen">
+            <option>Right now</option>
+            <option>Within an hour</option>
+            <option>Later today</option>
+            <option>Tomorrow</option>
+            <option>Scheduled / recurring</option>
+          </select>
+        </div>
+        <div>
+          <label class="fl" for="fOffer">Offer ($)</label>
+          <input type="number" id="fOffer" min="5" max="500" step="1" placeholder="18">
+        </div>
+      </div>
+
+      <div>
+        <label class="fl" for="fArea">Area</label>
+        <select id="fArea">
+          <option value="">Not sure / anywhere</option>
+          <option value="waconia">Waconia</option>
+          <option value="hopkins">Hopkins</option>
+          <option value="minnetonka">Minnetonka</option>
+          <option value="slp">St. Louis Park</option>
+          <option value="edenprairie">Eden Prairie</option>
+          <option value="plymouth">Plymouth</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="fl" for="fNotes">Anything else</label>
+        <textarea id="fNotes" maxlength="180" placeholder="Two bags. Can meet you at the north entrance."></textarea>
+      </div>
+
+      <div>
+        <label class="fl" for="fContact">How should the driver reach you?</label>
+        <p class="note" style="margin-bottom:6px">Phone, Signal, anything — only shown to whoever claims. Optional.</p>
+        <input type="text" id="fContact" maxlength="80" placeholder="612-555-0100 or @you on Signal">
+      </div>
+
+      <button class="go" id="post">Post it</button>
+      <p class="err" id="postErr"></p>
+      <p class="note">Zilch takes nothing. The full offer goes to whoever claims it.</p>
+    </div>
+  </div>
+
+  <div>
+    <div class="boardhead">
+      <h2 id="boardTitle">Open jobs</h2>
+      <div class="filters" role="group" aria-label="Filter the board">
+        <button type="button" data-f="all"  id="fAll"  aria-pressed="true">All</button>
+        <button type="button" data-f="ride" id="fRideF" aria-pressed="false">Rides</button>
+        <button type="button" data-f="delivery" id="fFoodF" aria-pressed="false">Delivery</button>
+        <button type="button" data-f="open" id="fOpenF" aria-pressed="false">Unclaimed only</button>
+      </div>
+    </div>
+    <div class="areabar" id="areaBar" hidden>
+      <span class="eyebrow" style="margin-right:10px">Your area</span>
+      <div class="filters" role="group" aria-label="Filter by area">
+        <button type="button" data-a="" id="aAll" aria-pressed="true">All areas</button>
+        <button type="button" data-a="waconia" id="aWaconia" aria-pressed="false">Waconia</button>
+        <button type="button" data-a="hopkins" id="aHopkins" aria-pressed="false">Hopkins</button>
+        <button type="button" data-a="minnetonka" id="aMinnetonka" aria-pressed="false">Minnetonka</button>
+        <button type="button" data-a="slp" id="aSlp" aria-pressed="false">St. Louis Park</button>
+        <button type="button" data-a="edenprairie" id="aEdenPrairie" aria-pressed="false">Eden Prairie</button>
+        <button type="button" data-a="plymouth" id="aPlymouth" aria-pressed="false">Plymouth</button>
+      </div>
+    </div>
+    <div class="list" id="list"></div>
+  </div>
+</div>
+
+<div class="overlay" id="insuranceGate" hidden>
+  <div class="gate">
+    <h2>One thing before you drive</h2>
+    <p>Upload your rideshare insurance card so riders know you're covered. Photo, screenshot, PDF — whatever you've got.</p>
+    <div class="upload-zone" id="uploadZone">
+      <input type="file" id="insuranceFile" accept="image/*,.pdf">
+      <div class="uz-label" id="uzLabel">Tap or drop your insurance card here</div>
+      <div class="uz-sub" id="uzSub">JPG, PNG or PDF</div>
+    </div>
+    <button class="gate-go" id="gateUpload" disabled>Upload &amp; continue</button>
+    <button class="gate-skip" id="gateSkip">Proceed without uploading?</button>
+    <p class="gate-msg" id="gateMsg"></p>
+  </div>
+</div>
+
+<footer>
+  <p><strong>Claiming uses a real lock.</strong> If two drivers hit the same job at once, one wins and the other is told it's gone.</p>
+  <p>Display names only. Contact info is optional and shown only to the driver who claims your job.</p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script>
+(function(){
+  "use strict";
+
+  var sb = window.supabase.createClient("https://zlvvtaydmaphdnhvmppj.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpsdnZ0YXlkbWFwaGRuaHZtcHBqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg5NzE3MTEsImV4cCI6MjEwNDU0NzcxMX0.t5ILb0-k3auW1Z3Em-gdR11rHURl5N-SVic9q1YDG7k");
+  var $ = function(id){ return document.getElementById(id); };
+
+  var kind = "ride", mode = "need", filter = "all", areaFilter = "";
+  var rows = [], ready = false;
+
+  var AREA_LABELS = {
+    waconia:"Waconia", hopkins:"Hopkins", minnetonka:"Minnetonka",
+    slp:"St. Louis Park", edenprairie:"Eden Prairie", plymouth:"Plymouth"
+  };
+
+  var AREA_IDS = [["","aAll"],["waconia","aWaconia"],["hopkins","aHopkins"],
+    ["minnetonka","aMinnetonka"],["slp","aSlp"],["edenprairie","aEdenPrairie"],["plymouth","aPlymouth"]];
+
+  // Per-browser secret. Only its hash is stored server-side; holding it is what
+  // makes you the owner of profiles and claims made from this browser.
+  var SECRET_KEY = "zilch.secret.v1", secret;
+  try { secret = localStorage.getItem(SECRET_KEY); } catch(e){}
+  if (!secret){
+    var rnd = new Uint8Array(24);
+    crypto.getRandomValues(rnd);
+    secret = Array.prototype.map.call(rnd, function(b){ return ("0" + b.toString(16)).slice(-2); }).join("");
+    try { localStorage.setItem(SECRET_KEY, secret); } catch(e){}
+  }
+
+  var myContacts = {};   // request id -> contact, for jobs this browser claimed
+  async function loadMyClaims(){
+    var res = await sb.rpc("my_claims", {p_secret: secret});
+    if (res.error || !res.data) return;
+    myContacts = {};
+    res.data.forEach(function(c){ myContacts[c.request_id] = c.contact || ""; });
+  }
+
+  function setAreaFilter(a){
+    areaFilter = a;
+    AREA_IDS.forEach(function(p){
+      $(p[1]).setAttribute("aria-pressed", String(areaFilter === p[0]));
+    });
+    try { localStorage.setItem("zilch.area.v1", a); } catch(e){}
+    render();
+  }
+  AREA_IDS.forEach(function(p){
+    $(p[1]).addEventListener("click", function(){ setAreaFilter(p[0]); });
+  });
+  try {
+    var savedArea = localStorage.getItem("zilch.area.v1");
+    if (savedArea !== null){
+      areaFilter = savedArea;
+      AREA_IDS.forEach(function(p){
+        $(p[1]).setAttribute("aria-pressed", String(areaFilter === p[0]));
+      });
+    }
+  } catch(e){}
+
+  /* --- insurance gate --- */
+  var INS_KEY = "zilch.insurance.v1";
+  var insCleared = false;
+  try { insCleared = localStorage.getItem(INS_KEY) === "1"; } catch(e){}
+
+  var selectedFile = null;
+  $("insuranceFile").addEventListener("change", function(e){
+    var f = e.target.files[0];
+    if (!f) return;
+    selectedFile = f;
+    $("uzLabel").textContent = f.name;
+    $("uzSub").textContent = (f.size / 1024).toFixed(0) + " KB";
+    $("uploadZone").classList.add("has-file");
+    $("gateUpload").disabled = false;
+  });
+
+  $("gateUpload").addEventListener("click", async function(){
+    if (!selectedFile) return;
+    var btn = $("gateUpload");
+    btn.disabled = true; btn.textContent = "Uploading…";
+    var ext = selectedFile.name.split(".").pop() || "jpg";
+    ext = ext.toLowerCase().replace(/[^a-z0-9]/g,"").slice(0,5) || "jpg";
+    var path = secret.slice(0,8) + "-" + Date.now().toString(36) + "." + ext;
+    var res = await sb.storage.from("insurance").upload(path, selectedFile, {upsert:false});
+    if (res.error){
+      $("gateMsg").textContent = "Upload failed — you can still proceed without it.";
+      btn.disabled = false; btn.textContent = "Try again";
+      return;
+    }
+    insCleared = true;
+    try { localStorage.setItem(INS_KEY, "1"); } catch(e){}
+    $("insuranceGate").hidden = true;
+    activateDriverMode();
+  });
+
+  $("gateSkip").addEventListener("click", function(){
+    insCleared = true;
+    try { localStorage.setItem(INS_KEY, "1"); } catch(e){}
+    $("insuranceGate").hidden = true;
+    activateDriverMode();
+  });
+
+  function showInsuranceGate(){
+    $("insuranceGate").hidden = false;
+    selectedFile = null;
+    $("uzLabel").textContent = "Tap or drop your insurance card here";
+    $("uzSub").textContent = "JPG, PNG or PDF";
+    $("uploadZone").classList.remove("has-file");
+    $("gateUpload").disabled = true;
+    $("gateUpload").textContent = "Upload & continue";
+    $("gateMsg").textContent = "";
+  }
+
+  function activateDriverMode(){
+    mode = "drive";
+    $("mNeed").setAttribute("aria-pressed", "false");
+    $("mDrive").setAttribute("aria-pressed", "true");
+    $("postPanel").hidden = true;
+    $("areaBar").hidden = false;
+    $("boardTitle").textContent = "Jobs you can claim";
+    if (filter === "all"){ setFilter("open"); } else { render(); }
+  }
+
+  function setMode(m){
+    if (m === "drive" && !insCleared){
+      showInsuranceGate();
+      return;
+    }
+    mode = m;
+    $("mNeed").setAttribute("aria-pressed", String(m === "need"));
+    $("mDrive").setAttribute("aria-pressed", String(m === "drive"));
+    $("postPanel").hidden = (m === "drive");
+    $("areaBar").hidden = (m !== "drive");
+    $("boardTitle").textContent = m === "drive" ? "Jobs you can claim" : "Open jobs";
+    if (m === "drive" && filter === "all"){ setFilter("open"); } else { render(); }
+  }
+  $("mNeed").addEventListener("click", function(){ setMode("need"); });
+  $("mDrive").addEventListener("click", function(){ setMode("drive"); });
+
+  function setKind(k){
+    kind = k;
+    $("kRide").setAttribute("aria-pressed", String(k === "ride"));
+    $("kFood").setAttribute("aria-pressed", String(k === "delivery"));
+    $("fFrom").placeholder = k === "ride" ? "Ridgedale Center, Minnetonka" : "Hola Arepa, Hopkins";
+    $("fTo").placeholder   = k === "ride" ? "Hopkins station" : "Home - I'll share the address after";
+  }
+  $("kRide").addEventListener("click", function(){ setKind("ride"); });
+  $("kFood").addEventListener("click", function(){ setKind("delivery"); });
+
+  function setFilter(f){
+    filter = f;
+    [["all","fAll"],["ride","fRideF"],["delivery","fFoodF"],["open","fOpenF"]].forEach(function(p){
+      $(p[1]).setAttribute("aria-pressed", String(filter === p[0]));
+    });
+    render();
+  }
+  [["all","fAll"],["ride","fRideF"],["delivery","fFoodF"],["open","fOpenF"]].forEach(function(p){
+    $(p[1]).addEventListener("click", function(){ setFilter(p[0]); });
+  });
+
+  function esc(s){
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){
+      return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
+    });
+  }
+
+  function render(){
+    var list = $("list");
+    var shown = rows.filter(function(r){
+      if (filter === "open") return r.status !== "claimed";
+      if (filter === "ride" || filter === "delivery") return r.kind === filter;
+      return true;
+    }).filter(function(r){
+      if (!areaFilter) return true;
+      return r.area === areaFilter || !r.area;
+    });
+
+    if (!ready){
+      list.innerHTML = '<div class="empty"><strong>Connecting to the board\u2026</strong>' +
+        'Open jobs are shared with everyone looking at this page.</div>';
+      return;
+    }
+    if (!shown.length){
+      list.innerHTML = '<div class="empty"><strong>Nothing on the board yet.</strong>' +
+        (mode === "drive"
+          ? "When someone posts a ride or a delivery near you, it lands here in real time."
+          : "Post the first one on the left and it appears here instantly for every driver looking at this page.") +
+        '</div>';
+      return;
+    }
+
+    list.innerHTML = shown.map(function(r){
+      var claimed = r.status === "claimed";
+      var mineClaim = claimed && Object.prototype.hasOwnProperty.call(myContacts, r.id);
+      var isRide = r.kind === "ride";
+      var areaLabel = r.area ? AREA_LABELS[r.area] || r.area : "";
+      var contactBlock = "";
+      if (mineClaim){
+        contactBlock = myContacts[r.id]
+          ? '<div class="contact-reveal"><span class="contact-label">How to reach them</span>' + esc(myContacts[r.id]) + '</div>'
+          : '<div class="contact-reveal" style="opacity:.6;font-style:italic">No contact info left \u2014 try posting in your area group that you have the job.</div>';
+      }
+      return '' +
+      '<div class="card' + (claimed ? " claimed" : "") + '">' +
+        '<div class="card-main">' +
+          '<div class="tags">' +
+            '<span class="tag ' + (isRide ? "t-ride" : "t-food") + '">' + (isRide ? "Ride" : "Delivery") + '</span>' +
+            '<span class="tag ' + (claimed ? "t-claimed" : "t-open") + '">' + (claimed ? "Claimed" : "Open") + '</span>' +
+            (areaLabel ? '<span class="area-tag">' + esc(areaLabel) + '</span>' : "") +
+          '</div>' +
+          '<div class="route">' + esc(r.pickup) +
+            '<span class="arrow">\u2192</span>' + esc(r.dropoff) + '</div>' +
+          '<div class="meta">' + esc(r.name || "Someone") +
+            '<span class="sep">|</span>' + esc(r.when_text) + '</div>' +
+          (r.notes ? '<div class="notes">' + esc(r.notes) + '</div>' : "") +
+          contactBlock +
+        '</div>' +
+        '<div class="card-side">' +
+          '<div class="offer">$' + Number(r.offer || 0).toFixed(0) +
+            '<small>' + (claimed ? "to driver" : "you keep 100%") + '</small></div>' +
+          (claimed
+            ? '<div class="claimedby">' + (mineClaim ? "You claimed this" : "Taken by " + esc(r.claimed_name || "a driver")) + '</div>'
+            : '<button class="claim" data-id="' + esc(r.id) + '">Claim it</button>') +
+        '</div>' +
+      '</div>';
+    }).join("");
+
+    Array.prototype.forEach.call(list.querySelectorAll(".claim"), function(b){
+      b.addEventListener("click", function(){ claim(b.getAttribute("data-id"), b); });
+    });
+  }
+
+  async function load(){
+    var both = await Promise.all([
+      sb.from("requests").select("*").order("created_at", {ascending:false}).limit(60),
+      loadMyClaims()
+    ]);
+    var res = both[0];
+    if (res.error){
+      $("list").innerHTML = '<div class="empty"><strong>Lost the board.</strong>Reload to reconnect.</div>';
+      return;
+    }
+    rows = res.data || [];
+    ready = true;
+    render();
+  }
+
+  async function claim(id, btn){
+    var who = (window.prompt("Your first name, so they know who's coming:") || "").trim().slice(0, 24);
+    if (!who) return;
+    btn.disabled = true;
+    btn.textContent = "Claiming\u2026";
+
+    var res = await sb.rpc("claim_request", {p_secret: secret, p_id: id, p_name: who});
+
+    if (res.error){
+      if (/taken/.test(res.error.message || "")){
+        btn.textContent = "Just taken";
+      } else {
+        btn.disabled = false;
+        btn.textContent = "Try again";
+        return;
+      }
+    }
+    load();
+  }
+
+  $("post").addEventListener("click", async function(){
+    var name  = $("fName").value.trim().slice(0,24);
+    var from  = $("fFrom").value.trim().slice(0,70);
+    var to    = $("fTo").value.trim().slice(0,70);
+    var offer = Number($("fOffer").value);
+    var errEl = $("postErr");
+
+    if (!from || !to){ errEl.textContent = "Where from and where to - both needed."; return; }
+    if (!(offer >= 5)){ errEl.textContent = "Offer at least $5. Minnesota's per-trip floor is $5."; return; }
+    errEl.textContent = "";
+
+    var btn = $("post");
+    btn.disabled = true; btn.textContent = "Posting\u2026";
+
+    var res = await sb.rpc("post_request", {p_secret: secret, p: {
+      kind: kind,
+      name: name || "Someone",
+      pickup: from,
+      dropoff: to,
+      when_text: $("fWhen").value,
+      offer: Math.round(offer),
+      notes: $("fNotes").value.trim().slice(0,180),
+      area: $("fArea").value || null,
+      contact: $("fContact").value.trim().slice(0,80) || null
+    }});
+
+    if (res.error){
+      errEl.textContent = "That didn't post. Try again in a second.";
+    } else {
+      $("fFrom").value = ""; $("fTo").value = ""; $("fOffer").value = ""; $("fNotes").value = ""; $("fContact").value = "";
+      load();
+    }
+    btn.disabled = false; btn.textContent = "Post it";
+  });
+
+  render();
+  load();
+
+  sb.channel("requests-live")
+    .on("postgres_changes", {event:"*", schema:"public", table:"requests"}, load)
+    .subscribe();
+})();
+</script>

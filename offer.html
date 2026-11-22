@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Offer Check — Zilch</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+  :root{
+    --paper:#EEF1F4; --surface:#FFFFFF; --surface-2:#E4E9EE;
+    --line:#C8D2DA; --line-soft:#DCE3E9;
+    --text:#0E1620; --text-2:#4A5A68; --text-3:#738796;
+    --accent:#FFB020; --accent-ink:#8A5300;
+    --ok:#1E8A5C; --ok-bg:#D8F0E4;
+    --maybe:#8A5300; --maybe-bg:#FCEBC7;
+    --warn:#A8402B; --warn-bg:#F7DFD8;
+    --shadow:0 1px 2px rgba(14,22,32,.05), 0 6px 18px -10px rgba(14,22,32,.16);
+    --radius:4px;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --paper:#0B1219; --surface:#121C26; --surface-2:#18242F;
+      --line:#2A3946; --line-soft:#1E2C38;
+      --text:#E8EEF3; --text-2:#A3B4C1; --text-3:#6F8494;
+      --accent:#FFB020; --accent-ink:#FFC65C;
+      --ok:#4FCB92; --ok-bg:#123528;
+      --maybe:#FFC65C; --maybe-bg:#3A2C10;
+      --warn:#E5806A; --warn-bg:#3A1E1A;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.7);
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#0B1219; --surface:#121C26; --surface-2:#18242F;
+    --line:#2A3946; --line-soft:#1E2C38;
+    --text:#E8EEF3; --text-2:#A3B4C1; --text-3:#6F8494;
+    --accent:#FFB020; --accent-ink:#FFC65C;
+    --ok:#4FCB92; --ok-bg:#123528;
+    --maybe:#FFC65C; --maybe-bg:#3A2C10;
+    --warn:#E5806A; --warn-bg:#3A1E1A;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.7);
+  }
+
+  *{box-sizing:border-box}
+  [hidden]{display:none!important}
+  body{
+    margin:0;background:var(--paper);color:var(--text);
+    font-family:"IBM Plex Sans","Segoe UI",Helvetica,Arial,sans-serif;
+    font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{margin:0}
+  p{margin:0}
+  .wrap{max-width:760px;margin:0 auto;padding:0 18px}
+  .mono{font-family:"IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
+  .eyebrow{
+    font-family:"IBM Plex Mono",ui-monospace,monospace;
+    font-size:10.5px;letter-spacing:.15em;text-transform:uppercase;
+    font-weight:600;color:var(--text-3);
+  }
+
+  .top{border-bottom:1px solid var(--line);background:var(--surface)}
+  .top-in{max-width:1180px;margin:0 auto;padding:12px 18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .wordmark{font-family:Anton,Impact,sans-serif;font-size:23px;letter-spacing:.02em;text-transform:uppercase;line-height:1;color:var(--text);text-decoration:none}
+  .wordmark span{color:var(--accent-ink)}
+  .sitenav{display:flex;gap:3px;align-items:center;flex-wrap:wrap}
+  .sitenav a{font-size:13px;font-weight:600;text-decoration:none;padding:7px 12px;
+    color:var(--text-2);border:1px solid transparent;border-radius:3px}
+  .sitenav a:hover{color:var(--text);border-color:var(--line)}
+  .sitenav a[aria-current="page"]{color:var(--text);background:var(--surface-2);border-color:var(--line)}
+
+  .intro{padding:32px 0 22px}
+  .intro h1{font-family:Anton,Impact,sans-serif;text-transform:uppercase;
+    font-size:clamp(32px,7vw,54px);line-height:.98;margin:12px 0 0}
+  .intro h1 em{font-style:normal;color:var(--accent-ink)}
+  .intro p{margin-top:14px;max-width:56ch;font-size:16px;color:var(--text-2)}
+
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:20px;margin-bottom:16px}
+  .card h2{font-size:16px;font-weight:600;margin-bottom:3px}
+  .card .sub{font-size:13px;color:var(--text-3);margin-bottom:14px}
+
+  label.fl{display:block;font-size:12.5px;font-weight:600;margin-bottom:5px;color:var(--text-2)}
+  input[type=number]{
+    font:inherit;font-family:"IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums;
+    font-size:22px;font-weight:600;padding:10px 12px;width:100%;
+    background:var(--surface);color:var(--text);
+    border:1px solid var(--line);border-radius:var(--radius);
+  }
+  input.small{font-size:16px;padding:8px 10px}
+  input:focus-visible,button:focus-visible{outline:2px solid var(--accent-ink);outline-offset:1px}
+  .grid{display:grid;gap:12px}
+  .g3{grid-template-columns:repeat(3,1fr)}
+  .g2{grid-template-columns:repeat(2,1fr)}
+  @media (max-width:520px){ .g3{grid-template-columns:1fr 1fr} .g3 > :first-child{grid-column:1 / -1} }
+
+  details.setup summary{cursor:pointer;font-weight:600;font-size:14px;list-style:none;display:flex;justify-content:space-between;align-items:center}
+  details.setup summary::-webkit-details-marker{display:none}
+  details.setup summary .mono{font-size:12.5px;color:var(--text-3);font-weight:500}
+  details.setup[open] summary{margin-bottom:14px}
+
+  /* verdict */
+  .verdict{border-radius:var(--radius);padding:20px;margin-bottom:16px;border:1px solid var(--line);background:var(--surface)}
+  .verdict.take{background:var(--ok-bg);border-color:var(--ok)}
+  .verdict.maybe{background:var(--maybe-bg);border-color:var(--maybe)}
+  .verdict.skip{background:var(--warn-bg);border-color:var(--warn)}
+  .vword{font-family:Anton,Impact,sans-serif;text-transform:uppercase;letter-spacing:.02em;
+    font-size:clamp(46px,13vw,84px);line-height:.92}
+  .verdict.take .vword{color:var(--ok)}
+  .verdict.maybe .vword{color:var(--maybe)}
+  .verdict.skip .vword{color:var(--warn)}
+  .verdict.idle .vword{color:var(--text-3)}
+  .vwhy{margin-top:8px;font-size:15px;color:var(--text-2);max-width:52ch}
+  .nums{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px}
+  @media (max-width:520px){ .nums{grid-template-columns:1fr 1fr} }
+  .num .v{font-family:"IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums;font-size:21px;font-weight:600;line-height:1.1}
+  .num .k{font-size:11.5px;color:var(--text-3);margin-top:3px}
+
+  .btnrow{display:flex;gap:10px;flex-wrap:wrap}
+  .btn{
+    font:inherit;font-size:14px;font-weight:600;padding:12px 16px;cursor:pointer;flex:1;
+    background:var(--surface);color:var(--text);border:1px solid var(--line);border-radius:var(--radius);
+  }
+  .btn:hover{border-color:var(--text-3)}
+  .btn.took{background:var(--ok);border-color:var(--ok);color:#fff}
+  .btn.ghost{flex:0 0 auto;color:var(--text-3)}
+  .btn:disabled{opacity:.4;cursor:default}
+
+  .shift .rows{display:flex;flex-direction:column}
+  .row{display:flex;justify-content:space-between;gap:14px;padding:8px 0;border-top:1px solid var(--line-soft);font-size:14px}
+  .row:first-child{border-top:0}
+  .row .k{color:var(--text-2)}
+  .row .v{font-family:"IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums;font-weight:600}
+  .log{margin-top:12px;max-height:220px;overflow:auto;border-top:1px solid var(--line-soft)}
+  .log div{display:flex;justify-content:space-between;gap:10px;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12.5px;padding:6px 0;border-bottom:1px solid var(--line-soft);color:var(--text-2)}
+  .log .tk{color:var(--ok);font-weight:600}
+  .log .dc{color:var(--text-3)}
+
+  .note{font-size:13px;color:var(--text-3);line-height:1.55}
+  footer{padding:26px 0 60px;color:var(--text-3);font-size:12.5px;line-height:1.6}
+  footer p{max-width:76ch;margin-bottom:8px}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="top-in">
+    <a class="wordmark" href="index.html">Zil<span>ch</span></a>
+    <nav class="sitenav">
+      <a href="index.html">The pitch</a>
+      <a href="find.html">Find a driver</a>
+      <a href="claim.html">Claim profile</a>
+      <a href="board.html">Board</a>
+      <a href="offer.html" aria-current="page">Offer check</a>
+      <a href="receipt.html">Receipts</a>
+      <a href="deact.html">Deactivations</a>
+      <a href="paycheck.html">Pay check</a>
+    </nav>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="intro">
+    <span class="eyebrow">For drivers · works with any app</span>
+    <h1>Is this offer <em>worth it</em>?</h1>
+    <p>The app shows you the payout. It doesn't show you what the trip costs your car, or the empty miles back. Punch in the offer and get the real number before the timer runs out.</p>
+  </div>
+
+  <div class="card">
+    <details class="setup" id="setup">
+      <summary>Your car and your floor <span class="mono" id="setupSum">—</span></summary>
+      <div class="grid g3">
+        <div><label class="fl" for="mpg">MPG</label><input class="small" type="number" id="mpg" inputmode="decimal" min="1" step="0.5" value="25"></div>
+        <div><label class="fl" for="gas">Gas $/gal</label><input class="small" type="number" id="gas" inputmode="decimal" min="0" step="0.01" value="3.00"></div>
+        <div><label class="fl" for="wear">Wear $/mile</label><input class="small" type="number" id="wear" inputmode="decimal" min="0" step="0.01" value="0.15"></div>
+      </div>
+      <p class="note" style="margin:8px 0 14px">Wear covers tires, oil, repairs and the value your car loses per mile. About $0.10–$0.25 for most cars. Set it to 0 to count gas only.</p>
+      <div class="grid g2">
+        <div><label class="fl" for="tHr">Your floor: $/hour after costs</label><input class="small" type="number" id="tHr" inputmode="decimal" min="0" step="1" value="20"></div>
+        <div><label class="fl" for="tMi">Your floor: $/mile on the payout</label><input class="small" type="number" id="tMi" inputmode="decimal" min="0" step="0.05" value="1.00"></div>
+      </div>
+      <p class="note" style="margin-top:8px">Saved on this phone. Nothing here is sent anywhere.</p>
+    </details>
+  </div>
+
+  <div class="card">
+    <h2>The offer</h2>
+    <p class="sub">Use the numbers the app shows. Empty miles back is how far you'll drive to get back somewhere busy.</p>
+    <div class="grid g3">
+      <div><label class="fl" for="pay">Payout $</label><input type="number" id="pay" inputmode="decimal" min="0" step="0.25" placeholder="8.50"></div>
+      <div><label class="fl" for="mi">Trip miles</label><input type="number" id="mi" inputmode="decimal" min="0" step="0.1" placeholder="4.2"></div>
+      <div><label class="fl" for="min">Minutes</label><input type="number" id="min" inputmode="decimal" min="0" step="1" placeholder="22"></div>
+    </div>
+    <div class="grid g2" style="margin-top:12px">
+      <div><label class="fl" for="back">Empty miles back</label><input class="small" type="number" id="back" inputmode="decimal" min="0" step="0.5" value="0"></div>
+      <div><label class="fl" for="wait">Expected wait at pickup (min)</label><input class="small" type="number" id="wait" inputmode="decimal" min="0" step="1" value="0"></div>
+    </div>
+  </div>
+
+  <div class="verdict idle" id="verdict" aria-live="polite">
+    <div class="vword" id="vWord">Waiting</div>
+    <p class="vwhy" id="vWhy">Enter the payout, miles and minutes.</p>
+    <div class="nums">
+      <div class="num"><div class="v" id="nNet">—</div><div class="k">you actually keep</div></div>
+      <div class="num"><div class="v" id="nHr">—</div><div class="k">per hour, after costs</div></div>
+      <div class="num"><div class="v" id="nMi">—</div><div class="k">per mile, payout</div></div>
+      <div class="num"><div class="v" id="nCost">—</div><div class="k">trip costs your car</div></div>
+    </div>
+  </div>
+
+  <div class="btnrow" style="margin-bottom:16px">
+    <button class="btn took" id="bTook" disabled>I took it</button>
+    <button class="btn" id="bPassed" disabled>I passed</button>
+    <button class="btn ghost" id="bClear">Clear</button>
+  </div>
+
+  <div class="card shift">
+    <h2>This shift</h2>
+    <p class="sub">Every offer you log, taken or passed. Totals count the ones you took.</p>
+    <div class="rows">
+      <div class="row"><span class="k">Offers taken / seen</span><span class="v" id="sCount">0 / 0</span></div>
+      <div class="row"><span class="k">Payouts</span><span class="v" id="sPay">$0.00</span></div>
+      <div class="row"><span class="k">Car costs</span><span class="v" id="sCost">$0.00</span></div>
+      <div class="row"><span class="k">You kept</span><span class="v" id="sNet">$0.00</span></div>
+      <div class="row"><span class="k">Real hourly, on-trip time</span><span class="v" id="sHr">—</span></div>
+      <div class="row"><span class="k">Miles driven, incl. empty</span><span class="v" id="sMi">0.0</span></div>
+    </div>
+    <div class="log" id="log"></div>
+    <div class="btnrow" style="margin-top:12px">
+      <button class="btn ghost" id="bCopy">Copy shift summary</button>
+      <button class="btn ghost" id="bReset">End shift &amp; reset</button>
+    </div>
+  </div>
+
+  <p class="note">"Real hourly" only counts time on trips you took. Time spent waiting for offers isn't in it, so your true hourly for the night is lower. Track your miles for taxes in a mileage app too. This page doesn't replace that.</p>
+</div>
+
+<footer class="wrap">
+  <p>Zilch isn't connected to DoorDash, Uber, Grubhub or any other app, and doesn't read your screen or tap anything for you. You decide every offer yourself.</p>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+  var $ = function(id){ return document.getElementById(id); };
+  var CAR_KEY = "zilch.car.v1", SHIFT_KEY = "zilch.shift.v1";
+  var SET_IDS = ["mpg","gas","wear","tHr","tMi"];
+  var OFFER_IDS = ["pay","mi","min","back","wait"];
+
+  function num(id){ var v = parseFloat($(id).value); return isFinite(v) ? v : NaN; }
+  function money(v){ return (v < 0 ? "−$" : "$") + Math.abs(v).toFixed(2); }
+
+  // --- settings
+  try {
+    var saved = JSON.parse(localStorage.getItem(CAR_KEY) || "null");
+    if (saved) SET_IDS.forEach(function(k){ if (saved[k] != null) $(k).value = saved[k]; });
+    else $("setup").open = true;
+  } catch(e){ $("setup").open = true; }
+
+  function saveSettings(){
+    var o = {}; SET_IDS.forEach(function(k){ o[k] = $(k).value; });
+    try { localStorage.setItem(CAR_KEY, JSON.stringify(o)); } catch(e){}
+    var cpm = costPerMile();
+    $("setupSum").textContent = isFinite(cpm) ? "$" + cpm.toFixed(2) + "/mi · floor $" + (num("tHr")||0) + "/hr" : "—";
+  }
+  function costPerMile(){
+    var mpg = num("mpg"), gas = num("gas"), wear = num("wear");
+    if (!(mpg > 0) || !(gas >= 0)) return NaN;
+    return gas / mpg + (wear >= 0 ? wear : 0);
+  }
+
+  // --- the math
+  var current = null;
+  function calc(){
+    var pay = num("pay"), mi = num("mi"), min = num("min");
+    var back = num("back") || 0, wait = num("wait") || 0;
+    var cpm = costPerMile(), tHr = num("tHr") || 0, tMi = num("tMi") || 0;
+    var v = $("verdict");
+
+    if (!(pay > 0) || !(mi >= 0) || !(min > 0) || !isFinite(cpm)){
+      current = null;
+      v.className = "verdict idle";
+      $("vWord").textContent = "Waiting";
+      $("vWhy").textContent = isFinite(cpm) ? "Enter the payout, miles and minutes." : "Set your MPG and gas price first.";
+      ["nNet","nHr","nMi","nCost"].forEach(function(k){ $(k).textContent = "—"; });
+      $("bTook").disabled = $("bPassed").disabled = true;
+      return;
+    }
+
+    var totalMi = mi + back;
+    var cost = totalMi * cpm;
+    var net = pay - cost;
+    // empty miles back take time too: assume ~2 minutes a mile in the suburbs
+    var totalMin = min + wait + back * 2;
+    var perHr = net / (totalMin / 60);
+    var perMi = mi > 0 ? pay / totalMi : Infinity;
+
+    var hrOk = perHr >= tHr, miOk = perMi >= tMi;
+    var hrClose = perHr >= tHr * 0.8, miClose = perMi >= tMi * 0.8;
+    var cls, word, why;
+    if (net <= 0){
+      cls = "skip"; word = "Skip"; why = "You'd lose " + money(-net) + " on this one. The payout doesn't even cover the car.";
+    } else if (hrOk && miOk){
+      cls = "take"; word = "Take it"; why = "Clears both your floors. " + money(perHr) + "/hr after the car is paid for.";
+    } else if (hrClose && miClose){
+      cls = "maybe"; word = "Maybe"; why = "Just under your floor" + (!hrOk ? " on hourly" : "") + (!hrOk && !miOk ? " and" : "") + (!miOk ? " on per mile" : "") +
+        ". Take it if it's slow or it ends somewhere busy.";
+    } else {
+      cls = "skip"; word = "Skip";
+      why = !hrClose && !miClose ? "Under your floor on both hourly and per mile."
+          : !hrClose ? "Only " + money(perHr) + "/hr after costs. Your floor is " + money(tHr) + "."
+          : "Only " + money(perMi) + " a mile counting the drive back. Your floor is " + money(tMi) + ".";
+    }
+
+    v.className = "verdict " + cls;
+    $("vWord").textContent = word;
+    $("vWhy").textContent = why;
+    $("nNet").textContent = money(net);
+    $("nHr").textContent = money(perHr);
+    $("nMi").textContent = isFinite(perMi) ? money(perMi) : "—";
+    $("nCost").textContent = money(cost);
+    $("bTook").disabled = $("bPassed").disabled = false;
+    current = {pay:pay, cost:cost, net:net, min:totalMin, mi:totalMi, verdict:cls, t:Date.now()};
+  }
+
+  // --- shift log
+  var shift = [];
+  try { shift = JSON.parse(localStorage.getItem(SHIFT_KEY) || "[]"); } catch(e){ shift = []; }
+  function saveShift(){ try { localStorage.setItem(SHIFT_KEY, JSON.stringify(shift)); } catch(e){} }
+
+  function renderShift(){
+    var took = shift.filter(function(s){ return s.took; });
+    var pay = 0, cost = 0, min = 0, mi = 0;
+    took.forEach(function(s){ pay += s.pay; cost += s.cost; min += s.min; mi += s.mi; });
+    $("sCount").textContent = took.length + " / " + shift.length;
+    $("sPay").textContent = money(pay);
+    $("sCost").textContent = money(cost);
+    $("sNet").textContent = money(pay - cost);
+    $("sHr").textContent = min > 0 ? money((pay - cost) / (min / 60)) : "—";
+    $("sMi").textContent = mi.toFixed(1);
+    $("log").innerHTML = shift.slice().reverse().map(function(s){
+      var time = new Date(s.t).toLocaleTimeString([], {hour:"numeric", minute:"2-digit"});
+      return '<div><span class="' + (s.took ? "tk" : "dc") + '">' + (s.took ? "TOOK" : "PASS") + " " + time + '</span>' +
+             '<span>' + money(s.pay) + " · " + s.mi.toFixed(1) + "mi · keep " + money(s.net) + '</span></div>';
+    }).join("");
+  }
+
+  function logIt(took){
+    if (!current) return;
+    shift.push({pay:current.pay, cost:current.cost, net:current.net, min:current.min, mi:current.mi, took:took, t:Date.now()});
+    saveShift(); renderShift(); clearOffer();
+  }
+  function clearOffer(){
+    ["pay","mi","min"].forEach(function(k){ $(k).value = ""; });
+    $("back").value = "0"; $("wait").value = "0";
+    calc(); $("pay").focus();
+  }
+
+  $("bTook").addEventListener("click", function(){ logIt(true); });
+  $("bPassed").addEventListener("click", function(){ logIt(false); });
+  $("bClear").addEventListener("click", clearOffer);
+  $("bReset").addEventListener("click", function(){
+    if (shift.length && !window.confirm("Clear this shift's log?")) return;
+    shift = []; saveShift(); renderShift();
+  });
+  $("bCopy").addEventListener("click", function(){
+    var text = "Shift: " + $("sCount").textContent + " offers taken. Payouts " + $("sPay").textContent +
+      ", car costs " + $("sCost").textContent + ", kept " + $("sNet").textContent +
+      " (" + $("sHr").textContent + "/hr on-trip). Checked with Zilch.";
+    if (navigator.clipboard) navigator.clipboard.writeText(text).then(function(){
+      $("bCopy").textContent = "Copied";
+      setTimeout(function(){ $("bCopy").textContent = "Copy shift summary"; }, 1600);
+    });
+  });
+
+  SET_IDS.forEach(function(k){ $(k).addEventListener("input", function(){ saveSettings(); calc(); }); });
+  OFFER_IDS.forEach(function(k){ $(k).addEventListener("input", calc); });
+
+  saveSettings(); calc(); renderShift();
+})();
+</script>
+</body>
+</html>
