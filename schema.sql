@@ -461,7 +461,7 @@ language sql stable security definer set search_path = public as $$
   select r.offer, r.kind, r.pickup, r.dropoff, r.pay_status, pa.stripe_account
     from requests r
     join request_private rp on rp.request_id = r.id
-    left join payout_accounts pa on pa.owner_hash = rp.claimer_hash and pa.ready
+    left join payout_accounts pa on pa.owner_hash = rp.claimer_hash   -- payments re-checks the account with Stripe live
    where r.id = p_request and r.status = 'claimed'
      and rp.poster_hash = zilch_hash(p_secret);
 $$;

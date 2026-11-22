@@ -1,4 +1,5 @@
-// Zilch payments. Drivers connect a Stripe Express account once; posters pay
+// Zilch payments. Drivers connect a Stripe account once (Accounts v2, full
+// Stripe Dashboard, Stripe collects fees and owns loss liability); posters pay
 // for a claimed job by card. The charge is made on the driver's own Stripe
 // account (a "direct charge"), so the money goes to the driver, Stripe's fee
 // comes out of the driver's side, and Zilch takes nothing. The card is only
@@ -11,7 +12,7 @@
 //   release  -> { ok }     capture the held payment (poster only)
 //   cancel   -> { ok }     drop the hold (poster only)
 
-import { cors, db, json, stripe } from "../_shared/stripe.ts";
+import { canAcceptCards, cors, db, json, stripe } from "../_shared/stripe.ts";
 
 function safeReturn(url: unknown): string | null {
   if (typeof url !== "string") return null;
@@ -43,8 +44,7 @@ Deno.serve(async (req) => {
 
       if (action === "status") {
         if (!account) return json({ ready: false, started: false });
-        const acct = await stripe.accounts.retrieve(account);
-        const ready = Boolean(acct.charges_enabled);
+        const ready = await canAcceptCards(account);
         await db.rpc("pay_mark_ready", { p_account: account, p_ready: ready });
         return json({ ready, started: true });
       }
@@ -52,22 +52,25 @@ Deno.serve(async (req) => {
       const back = safeReturn(body.return_url);
       if (!back) return json({ error: "bad return_url" }, 400);
       if (!account) {
-        const acct = await stripe.accounts.create({
-          type: "express",
-          country: "US",
-          business_type: "individual",
-          capabilities: { card_payments: { requested: true }, transfers: { requested: true } },
-          business_profile: { product_description: "Independent ride and delivery driver paid directly through Zilch." },
+        // Direct charges: the driver is the merchant of record and keeps the
+        // customer relationship, so they get the full Stripe Dashboard and
+        // Stripe (not Zilch) bills fees and covers negative balances.
+        const acct = await stripe.v2.core.accounts.create({
+          dashboard: "full",
+          identity: { country: "us", entity_type: "individual" },
+          defaults: { responsibilities: { fees_collector: "stripe", losses_collector: "stripe" } },
+          configuration: { merchant: { capabilities: { card_payments: { requested: true } } } },
         });
         account = acct.id;
         const { error } = await db.rpc("pay_set_account", { p_secret: secret, p_account: account });
         if (error) throw error;
       }
-      const link = await stripe.accountLinks.create({
+      const link = await stripe.v2.core.accountLinks.create({
         account,
-        refresh_url: back,
-        return_url: back,
-        type: "account_onboarding",
+        use_case: {
+          type: "account_onboarding",
+          account_onboarding: { refresh_url: back, return_url: back },
+        },
       });
       return json({ url: link.url });
     }
@@ -81,6 +84,11 @@ Deno.serve(async (req) => {
       if (!job) return json({ error: "Only the person who posted a claimed job can pay for it." }, 403);
       if (job.pay_status === "held" || job.pay_status === "paid") return json({ error: "Already paid." }, 409);
       if (!job.driver_account) return json({ error: "This driver hasn't switched on card payouts yet." }, 409);
+      // Re-check with Stripe right before charging, not just our cached flag.
+      if (!(await canAcceptCards(job.driver_account))) {
+        await db.rpc("pay_mark_ready", { p_account: job.driver_account, p_ready: false });
+        return json({ error: "This driver's Stripe account can't take card payments right now." }, 409);
+      }
 
       const cents = Math.round(Number(job.offer) * 100);
       if (!(cents >= 500)) return json({ error: "Offer too low to pay by card." }, 400);
@@ -88,6 +96,7 @@ Deno.serve(async (req) => {
       const sep = back.includes("?") ? "&" : "?";
       const session = await stripe.checkout.sessions.create({
         mode: "payment",
+        integration_identifier: "zilch-job-payment-qwmrtzkb",
         line_items: [{
           quantity: 1,
           price_data: {

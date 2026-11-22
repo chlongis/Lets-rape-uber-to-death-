@@ -1,9 +1,11 @@
-import Stripe from "npm:stripe@17.4.0";
+import Stripe from "npm:stripe@23.2.0";
 export { Stripe };
 import { createClient } from "npm:@supabase/supabase-js@2.45.4";
 
+// Use a restricted key (rk_...) with Connect, Checkout Sessions and PaymentIntents
+// write access. A full secret key (sk_...) also works but can do far more if leaked.
 export const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") ?? "", {
-  apiVersion: "2024-11-20.acacia",
+  apiVersion: "2026-11-18.endive",
   httpClient: Stripe.createFetchHttpClient(),
 });
 
@@ -13,6 +15,12 @@ export const db = createClient(
   Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
   { auth: { persistSession: false } },
 );
+
+// A driver can be paid once Stripe has switched on card payments for their account.
+export async function canAcceptCards(account: string): Promise<boolean> {
+  const acct = await stripe.v2.core.accounts.retrieve(account, { include: ["configuration.merchant"] });
+  return acct.configuration?.merchant?.capabilities?.card_payments?.status === "active";
+}
 
 export const cors = {
   "Access-Control-Allow-Origin": "*",
