@@ -1,11 +1,11 @@
 // Zilch service worker. Makes the site installable and keeps the offer
 // check and receipt card working with no signal. Database calls (Supabase)
 // always go to the network and are never cached.
-var VERSION = "zilch-v1";
+var VERSION = "zilch-v2";
 var CORE = [
   "./", "./index.html", "./offer.html", "./receipt.html", "./board.html", "./find.html",
   "./claim.html", "./d.html", "./deact.html", "./paycheck.html", "./pledge.html",
-  "./pwa.js", "./manifest.webmanifest", "./icons/icon-192.png", "./icons/icon-512.png"
+  "./pwa.js", "./offer-parse.js", "./manifest.webmanifest", "./icons/icon-192.png", "./icons/icon-512.png"
 ];
 
 self.addEventListener("install", function(e){
@@ -14,12 +14,29 @@ self.addEventListener("install", function(e){
 
 self.addEventListener("activate", function(e){
   e.waitUntil(caches.keys().then(function(keys){
-    return Promise.all(keys.filter(function(k){ return k !== VERSION; }).map(function(k){ return caches.delete(k); }));
+    return Promise.all(keys.filter(function(k){ return k !== VERSION && k !== "zilch-share"; }).map(function(k){ return caches.delete(k); }));
   }).then(function(){ return self.clients.claim(); }));
 });
 
 self.addEventListener("fetch", function(e){
   var req = e.request;
+
+  // Android share target: a screenshot shared to Zilch arrives as a POST to
+  // offer.html. Park the image, then open the offer check to read it.
+  if (req.method === "POST" && new URL(req.url).pathname.endsWith("/offer.html")){
+    e.respondWith((async function(){
+      try {
+        var form = await req.formData();
+        var file = form.get("shot");
+        if (file){
+          var c = await caches.open("zilch-share");
+          await c.put("shared-shot", new Response(file, {headers: {"Content-Type": file.type || "image/png"}}));
+        }
+      } catch(err){}
+      return Response.redirect("./offer.html?shared=1", 303);
+    })());
+    return;
+  }
   if (req.method !== "GET") return;
   var url = new URL(req.url);
   if (/supabase\.co$/.test(url.hostname)) return;          // live data: never cache

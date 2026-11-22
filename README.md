@@ -18,7 +18,7 @@ Static HTML, no build step, one free database. **Fork it and run it in your city
 | `d.html?h=<handle>` | The public profile. Stats, verification badge, one-tap contact, QR code, vCard, printable card. |
 | `find.html` | Searchable directory by name, vehicle, bio and area. |
 | `board.html` | Peer-to-peer job board. Post a ride or delivery, name your price, a driver claims it. |
-| `offer.html` | Offer check. Enter an offer's payout, miles and minutes and get Take it / Maybe / Skip based on the driver's own car costs and floors. Logs the shift. Runs on the phone only. |
+| `offer.html` | Offer check. Enter an offer's payout, miles and minutes, or read them from a screenshot (on-device OCR with Tesseract.js; `offer-parse.js` pulls the numbers out; Android can share a screenshot straight to the installed app), and get Take it / Maybe / Skip based on the driver's own car costs and floors. Logs the shift. Nothing is uploaded. |
 | `receipt.html` | "Where the money went" card. Customer paid vs. counter price vs. driver pay, drawn as a square image to post. Runs on the phone only. |
 | `deact.html` | Anonymous deactivation tracker. Fixed-choice reports, live stats on how many came with no reason. |
 | `paycheck.html` | Checks a pay period against the legal minimum in Minnesota, Washington, Seattle and New York City. |

@@ -145,6 +145,12 @@
   .log .dc{color:var(--text-3)}
 
   .note{font-size:13px;color:var(--text-3);line-height:1.55}
+  .shot{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+  .shotbtn{font:inherit;font-size:14px;font-weight:600;padding:11px 14px;cursor:pointer;border-radius:var(--radius);
+    background:var(--accent);color:#0E1620;border:1px solid var(--accent);position:relative;overflow:hidden}
+  .shotbtn input{position:absolute;inset:0;opacity:0;cursor:pointer}
+  .shotmsg{font-size:13px;color:var(--text-2);flex:1;min-width:180px}
+  input.filled{border-color:var(--accent);box-shadow:0 0 0 2px var(--maybe-bg)}
   footer{padding:26px 0 60px;color:var(--text-3);font-size:12.5px;line-height:1.6}
   footer p{max-width:76ch;margin-bottom:8px}
   @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
@@ -195,6 +201,10 @@
   <div class="card">
     <h2>The offer</h2>
     <p class="sub">Use the numbers the app shows. Empty miles back is how far you'll drive to get back somewhere busy.</p>
+    <div class="shot">
+      <label class="shotbtn">Read a screenshot<input type="file" id="shotFile" accept="image/*"></label>
+      <span class="shotmsg" id="shotMsg">Screenshot the offer, then pick it here. It's read on your phone and never uploaded.</span>
+    </div>
     <div class="grid g3">
       <div><label class="fl" for="pay">Payout $</label><input type="number" id="pay" inputmode="decimal" min="0" step="0.25" placeholder="8.50"></div>
       <div><label class="fl" for="mi">Trip miles</label><input type="number" id="mi" inputmode="decimal" min="0" step="0.1" placeholder="4.2"></div>
@@ -248,6 +258,7 @@
   <p>Zilch isn't connected to DoorDash, Uber, Grubhub or any other app, and doesn't read your screen or tap anything for you. You decide every offer yourself.</p>
 </footer>
 
+<script src="offer-parse.js"></script>
 <script>
 (function(){
   "use strict";
@@ -384,6 +395,64 @@
 
   SET_IDS.forEach(function(k){ $(k).addEventListener("input", function(){ saveSettings(); calc(); }); });
   OFFER_IDS.forEach(function(k){ $(k).addEventListener("input", calc); });
+
+  /* --- read an offer screenshot (on-device OCR) --- */
+  var ocrWorker = null;
+  function loadScript(src){
+    return new Promise(function(ok, bad){
+      var sc = document.createElement("script"); sc.src = src; sc.onload = ok; sc.onerror = bad;
+      document.head.appendChild(sc);
+    });
+  }
+  async function getWorker(){
+    if (ocrWorker) return ocrWorker;
+    if (!window.Tesseract) await loadScript("https://cdn.jsdelivr.net/npm/tesseract.js@7.0.0/dist/tesseract.min.js");
+    ocrWorker = await window.Tesseract.createWorker("eng");
+    return ocrWorker;
+  }
+  async function readShot(file){
+    if (!file || !/^image\//.test(file.type)) return;
+    var msg = $("shotMsg");
+    msg.textContent = ocrWorker ? "Reading\u2026" : "Reading\u2026 the first time takes a few seconds to load.";
+    try {
+      var w = await getWorker();
+      var res = await w.recognize(file);
+      var got = window.parseOffer(res.data.text, new Date());
+      var filled = [];
+      [["pay", got.pay], ["mi", got.miles], ["min", got.minutes]].forEach(function(f){
+        $(f[0]).classList.remove("filled");
+        if (f[1] != null){ $(f[0]).value = f[1]; $(f[0]).classList.add("filled"); filled.push(f[0]); }
+      });
+      calc();
+      if (!filled.length){ msg.textContent = "Couldn't find the numbers in that one. Type them in, or try a sharper screenshot."; return; }
+      var missing = ["pay","mi","min"].filter(function(k){ return filled.indexOf(k) < 0; })
+        .map(function(k){ return {pay:"payout", mi:"miles", min:"minutes"}[k]; });
+      msg.textContent = "Filled in from the screenshot. Double-check the highlighted numbers." +
+        (missing.length ? " Couldn't find: " + missing.join(", ") + "." : "") +
+        (got.notes.length ? " " + got.notes.join(" ") : "");
+    } catch(e){
+      msg.textContent = "Couldn't read screenshots right now (needs a connection the first time). Type the numbers in.";
+    }
+  }
+  $("shotFile").addEventListener("change", function(e){ readShot(e.target.files[0]); e.target.value = ""; });
+  document.addEventListener("paste", function(e){
+    var items = (e.clipboardData && e.clipboardData.items) || [];
+    for (var i = 0; i < items.length; i++){
+      if (items[i].type.indexOf("image/") === 0){ readShot(items[i].getAsFile()); e.preventDefault(); return; }
+    }
+  });
+  ["pay","mi","min"].forEach(function(k){ $(k).addEventListener("input", function(){ $(k).classList.remove("filled"); }); });
+
+  // Android: a screenshot shared to the installed app lands here (see sw.js).
+  if (/[?&]shared=1/.test(location.search) && "caches" in window){
+    caches.open("zilch-share").then(function(c){
+      return c.match("shared-shot").then(function(r){
+        if (!r) return;
+        return r.blob().then(function(b){ c.delete("shared-shot"); readShot(new File([b], "offer", {type: b.type || "image/png"})); });
+      });
+    });
+    history.replaceState(null, "", location.pathname);
+  }
 
   saveSettings(); calc(); renderShift();
 })();
