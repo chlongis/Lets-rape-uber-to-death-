@@ -10,58 +10,53 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Zilch">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>Driver Pay Check</title>
+<title>Pay Check — Zilch</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Libre+Franklin:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <style>
   :root{
-    --paper:#F2F3F1;
-    --surface:#FFFFFF;
-    --surface-2:#E7EAE7;
-    --line:#C6CCC7;
-    --line-soft:#DDE2DE;
-    --text:#141C18;
-    --text-2:#4B564F;
-    --text-3:#76827A;
-    --pine:#1F5C4A;
-    --pine-bg:#DCEBE4;
-    --short:#A32E22;
-    --short-bg:#F7E0DC;
-    --ok:#1F5C4A;
-    --shadow:0 1px 2px rgba(20,28,24,.05), 0 8px 24px -14px rgba(20,28,24,.22);
-    --radius:3px;
+    --paper:#EEF1F4; --surface:#FFFFFF; --surface-2:#E4E9EE;
+    --line:#C8D2DA; --line-soft:#DCE3E9;
+    --text:#0E1620; --text-2:#4A5A68; --text-3:#738796;
+    --accent:#FFB020; --accent-ink:#8A5300;
+    --pine:#8A5300; --pine-bg:#FCEBC7;
+    --short:#A8402B; --short-bg:#F7DFD8;
+    --ok:#1E8A5C;
+    --shadow:0 1px 2px rgba(14,22,32,.05), 0 6px 18px -10px rgba(14,22,32,.16);
+    --radius:4px;
   }
   @media (prefers-color-scheme:dark){
     :root:not([data-theme="light"]){
-      --paper:#0F1512; --surface:#161E1A; --surface-2:#1D2723;
-      --line:#2E3A34; --line-soft:#232E29;
-      --text:#E8EDE9; --text-2:#A6B2AB; --text-3:#75837B;
-      --pine:#6FC5A4; --pine-bg:#16302700;
-      --pine-bg:#153027;
-      --short:#E88878; --short-bg:#3A1E1A;
-      --ok:#6FC5A4;
-      --shadow:0 1px 2px rgba(0,0,0,.45), 0 10px 28px -14px rgba(0,0,0,.75);
+      --paper:#0B1219; --surface:#121C26; --surface-2:#18242F;
+      --line:#2A3946; --line-soft:#1E2C38;
+      --text:#E8EEF3; --text-2:#A3B4C1; --text-3:#6F8494;
+      --accent:#FFB020; --accent-ink:#FFC65C;
+      --pine:#FFC65C; --pine-bg:#3A2C10;
+      --short:#E5806A; --short-bg:#3A1E1A;
+      --ok:#4FCB92;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.7);
     }
   }
   :root[data-theme="dark"]{
-    --paper:#0F1512; --surface:#161E1A; --surface-2:#1D2723;
-    --line:#2E3A34; --line-soft:#232E29;
-    --text:#E8EDE9; --text-2:#A6B2AB; --text-3:#75837B;
-    --pine:#6FC5A4; --pine-bg:#153027;
-    --short:#E88878; --short-bg:#3A1E1A;
-    --ok:#6FC5A4;
-    --shadow:0 1px 2px rgba(0,0,0,.45), 0 10px 28px -14px rgba(0,0,0,.75);
+    --paper:#0B1219; --surface:#121C26; --surface-2:#18242F;
+    --line:#2A3946; --line-soft:#1E2C38;
+    --text:#E8EEF3; --text-2:#A3B4C1; --text-3:#6F8494;
+    --accent:#FFB020; --accent-ink:#FFC65C;
+    --pine:#FFC65C; --pine-bg:#3A2C10;
+    --short:#E5806A; --short-bg:#3A1E1A;
+    --ok:#4FCB92;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.7);
   }
 
   *{box-sizing:border-box}
   [hidden]{display:none!important}
   body{
     background:var(--paper);color:var(--text);
-    font-family:"Libre Franklin",-apple-system,Helvetica,Arial,sans-serif;
+    font-family:"IBM Plex Sans","Segoe UI",Helvetica,Arial,sans-serif;
     font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;
   }
-  h1,h2,h3{margin:0;font-family:"Source Serif 4",Georgia,serif;text-wrap:balance}
+  h1,h2,h3{margin:0;font-family:"IBM Plex Sans","Segoe UI",Helvetica,Arial,sans-serif;font-weight:600;text-wrap:balance}
   p{margin:0}
   .wrap{max-width:1000px;margin:0 auto;padding:0 22px}
   .mono{font-family:"IBM Plex Mono",ui-monospace,Menlo,monospace;font-variant-numeric:tabular-nums}
@@ -70,11 +65,11 @@
     font-size:10.5px;letter-spacing:.15em;text-transform:uppercase;font-weight:600;color:var(--text-3);
   }
 
-  .masthead{border-bottom:2px solid var(--text);background:var(--surface)}
-  .masthead-in{max-width:1000px;margin:0 auto;padding:16px 22px}
-  .masthead h1{font-size:21px;font-weight:700;line-height:1.2}
-  .masthead p{font-size:13px;color:var(--text-2);margin-top:3px}
-  .sitenav{display:flex;gap:3px;flex-wrap:wrap;margin-top:11px;margin-left:-11px}
+  .top{border-bottom:1px solid var(--line);background:var(--surface)}
+  .top-in{max-width:1180px;margin:0 auto;padding:12px 22px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .wordmark{font-family:Anton,Impact,sans-serif;font-size:23px;letter-spacing:.02em;text-transform:uppercase;line-height:1;color:var(--text);text-decoration:none}
+  .wordmark span{color:var(--accent-ink)}
+  .sitenav{display:flex;gap:3px;align-items:center;flex-wrap:wrap}
   .sitenav a{font-size:13px;font-weight:600;text-decoration:none;padding:6px 11px;
     color:var(--text-2);border:1px solid transparent;border-radius:var(--radius)}
   .sitenav a:hover{color:var(--text);border-color:var(--line)}
@@ -82,13 +77,13 @@
   .sitenav a:focus-visible{outline:2px solid var(--pine);outline-offset:2px}
 
   .intro{padding:44px 0 34px;border-bottom:1px solid var(--line)}
-  .intro h2{font-size:clamp(27px,4.6vw,42px);line-height:1.12;font-weight:700}
+  .intro h2{font-family:Anton,Impact,sans-serif;text-transform:uppercase;font-weight:400;font-size:clamp(34px,7vw,60px);line-height:.98;margin-top:14px}
   .intro p{margin-top:16px;max-width:64ch;font-size:17px;color:var(--text-2)}
   .intro p strong{color:var(--text);font-weight:600}
 
   section{padding:44px 0;border-bottom:1px solid var(--line)}
   .sec-head{margin-bottom:24px}
-  .sec-head h2{font-size:clamp(22px,3.4vw,31px);line-height:1.15;margin-top:8px;font-weight:700}
+  .sec-head h2{font-family:Anton,Impact,sans-serif;text-transform:uppercase;font-weight:400;font-size:clamp(26px,4.4vw,38px);line-height:1.02;margin-top:8px}
   .sec-head p{margin-top:11px;max-width:66ch;color:var(--text-2);font-size:15.5px}
 
   .tool{
@@ -133,7 +128,7 @@
   .verdict.ok{border-left-color:var(--ok)}
   .verdict.idle{border-left-color:var(--line)}
   .vhead{
-    font-family:"Source Serif 4",Georgia,serif;font-weight:700;
+    font-family:Anton,Impact,sans-serif;text-transform:uppercase;font-weight:400;letter-spacing:.01em;
     font-size:clamp(23px,3.6vw,33px);line-height:1.15;
   }
   .verdict.short .vhead{color:var(--short)}
@@ -158,10 +153,8 @@
 
   .act{
     font:inherit;font-size:15px;font-weight:600;padding:11px 20px;cursor:pointer;align-self:flex-start;
-    background:var(--pine);color:#fff;border:1px solid var(--pine);border-radius:var(--radius);
+    background:var(--accent);color:#0E1620;border:1px solid var(--accent);border-radius:var(--radius);
   }
-  :root[data-theme="dark"] .act{color:#0F1512}
-  @media (prefers-color-scheme:dark){ :root:not([data-theme="light"]) .act{color:#0F1512} }
   .act:hover{opacity:.9}
   .act:disabled{opacity:.4;cursor:default}
   .act:focus-visible{outline:2px solid var(--text);outline-offset:2px}
@@ -211,19 +204,18 @@
   @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 
-<div class="masthead">
-  <div class="masthead-in">
-    <h1>Driver Pay Check</h1>
-    <p>Minnesota, Washington and New York City. Independent, not affiliated with any agency or platform.</p>
+<div class="top">
+  <div class="top-in">
+    <a class="wordmark" href="index.html">Zil<span>ch</span></a>
     <nav class="sitenav">
+      <a href="index.html">The pitch</a>
+      <a href="find.html">Find a driver</a>
+      <a href="claim.html">Claim profile</a>
+      <a href="board.html">Board</a>
       <a href="offer.html">Offer check</a>
       <a href="receipt.html">Receipts</a>
       <a href="deact.html">Deactivations</a>
       <a href="paycheck.html" aria-current="page">Pay check</a>
-      <a href="index.html">Zilch</a>
-      <a href="find.html">Find a driver</a>
-      <a href="claim.html">Claim profile</a>
-      <a href="board.html">Board</a>
     </nav>
   </div>
 </div>
