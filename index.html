@@ -297,7 +297,7 @@
 </header>
 
 <main>
-<div class="ticker" aria-hidden="true"><span id="tick">0% COMMISSION &nbsp;★&nbsp; KEEP THE WHOLE FARE &nbsp;★&nbsp; SCREENSHOT YOUR LOWBALLS &nbsp;★&nbsp; MN DELIVERY DRIVERS HAVE NO PAY FLOOR. NONE. &nbsp;★&nbsp; FUCK THE MIDDLEMAN &nbsp;★&nbsp; DOORDASH IS THE GOOCH: THE SPACE BETWEEN YOU AND YOUR MONEY &nbsp;★&nbsp; IT'S FREE, NO CATCH &nbsp;★&nbsp;</span></div>
+<div class="ticker" aria-hidden="true"><span id="tick">0% COMMISSION &nbsp;★&nbsp; KEEP THE WHOLE FARE &nbsp;★&nbsp; SCREENSHOT YOUR LOWBALLS &nbsp;★&nbsp; MN DELIVERY DRIVERS HAVE NO PAY FLOOR. NONE. &nbsp;★&nbsp; FUCK THE MIDDLEMAN &nbsp;★&nbsp; DOORDASH IS THE GOOCH: THE SPACE BETWEEN YOU AND YOUR MONEY &nbsp;★&nbsp; EVERY RECEIPT AND DEACTIVATION REPORT IS A RECORD. ENOUGH OF THEM AND WE TAKE IT TO COURT &nbsp;★&nbsp; IT'S FREE, NO CATCH &nbsp;★&nbsp;</span></div>
   <div class="hero wrap">
     <h1>Work for yourself,<br> <em>for real this time</em>.</h1>
     <p class="hero-sub">Okay so heres the deal. Your rating is the most valuable thing you have and you cant take it anywhere, it lives in their app and the second they deactivate you its gone. <strong>So make one thats actually yours and cut out the middleman.</strong></p>
@@ -335,6 +335,12 @@
   </section>
 
   <section class="wrap rant">
+    <h2>The endgame</h2>
+    <p>Every receipt, lowball and deactivation report on here is a record. One driver complaining is easy to ignore, hundreds of them showing the same pattern isnt, and patterns are what lawyers and the state actually go after. The goal is to get enough on record that a class action against these companies is actually on the table.</p>
+    <p>Real talk tho, Zilch isnt a law firm, theres no lawsuit yet and this isnt legal advice. If you want in on anything down the road, keep your own stuff: screenshots of offers, pay statements, deactivation emails, all of it. And if you drive rideshare in MN and got deactivated with no reason or got paid under the minimum, you can <a href="https://dli.mn.gov/tnc">file with the MN Department of Labor</a> right now, you dont have to wait on us.</p>
+  </section>
+
+  <section class="wrap rant">
     <h2>Other shit that's on here</h2>
     <ul class="links">
       <li><a href="board.html">The job board</a> Someone posts a ride or delivery and a price and a driver claims it. No commission no surge bullshit</li>
@@ -366,7 +372,7 @@
     var tick = document.getElementById("tick"); if (!tick) return;
     var SLOGANS = ["0% COMMISSION", "KEEP THE WHOLE FARE", "SCREENSHOT YOUR LOWBALLS", "MN DELIVERY DRIVERS HAVE NO PAY FLOOR. NONE.",
       "FUCK THE MIDDLEMAN", "DOORDASH IS THE GOOCH: THE SPACE BETWEEN YOU AND YOUR MONEY",
-      "UBER AND LYFT DRIVERS IN MN GET $1.28/MI MINIMUM. DASHERS GET NOTHING", "IT'S FREE, NO CATCH"];
+      "UBER AND LYFT DRIVERS IN MN GET $1.28/MI MINIMUM. DASHERS GET NOTHING", "EVERY RECEIPT AND DEACTIVATION REPORT IS A RECORD. ENOUGH OF THEM AND WE TAKE IT TO COURT", "IT'S FREE, NO CATCH"];
     fetch(URL + "?select=platform,payout,miles,per_hour&order=per_hour.asc&limit=40", {headers:{apikey:KEY, Authorization:"Bearer " + KEY}})
       .then(function(r){ return r.json(); })
       .then(function(rows){
