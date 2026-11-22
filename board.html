@@ -10,7 +10,20 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Zilch">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>Zilch Board</title>
+<title>Job board | Zilch</title>
+<meta name="description" content="Post a ride or delivery, name your price, and a driver claims it. The driver keeps 100%.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Zilch">
+<meta property="og:title" content="Job board | Zilch">
+<meta property="og:description" content="Post a ride or delivery, name your price, and a driver claims it. The driver keeps 100%.">
+<meta property="og:url" content="https://chlongis.github.io/UberBoober/board.html">
+<meta property="og:image" content="https://chlongis.github.io/UberBoober/icons/share.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Job board | Zilch">
+<meta name="twitter:description" content="Post a ride or delivery, name your price, and a driver claims it. The driver keeps 100%.">
+<meta name="twitter:image" content="https://chlongis.github.io/UberBoober/icons/share.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
@@ -325,7 +338,7 @@
 </div>
 
 <div class="banner">
-  <b>Working prototype.</b> Post and claim to see how it behaves. Don't arrange real trips through it — no identity checks, no insurance, no payments yet.
+  <b>You deal with each other directly.</b> Zilch doesn't check IDs or provide insurance. Check the driver's profile, meet in public, and only ride or hand off with people you're comfortable with.
 </div>
 
 <div class="shell">
@@ -529,9 +542,12 @@
     }
     renderPayout();
   }
+  // Flip to true once the Stripe keys and webhook are set up in Supabase.
+  var PAYMENTS_LIVE = false;
+
   function renderPayout(){
     var bar = $("payoutBar");
-    bar.hidden = mode !== "drive";
+    bar.hidden = mode !== "drive" || !PAYMENTS_LIVE;
     if (payoutState === "ready"){
       bar.className = "payout on";
       bar.innerHTML = "<span><b>Card payouts on.</b> Posters can pay you by card. Money goes straight to your Stripe account.</span>" +
@@ -575,6 +591,7 @@
   }
 
   function payBlock(r, mine){
+    if (!PAYMENTS_LIVE) return "";
     var st = r.pay_status || "none", amt = "$" + Number(r.offer || 0).toFixed(0);
     if (!mine || r.status !== "claimed") return "";
     if (mine.role === "poster"){
