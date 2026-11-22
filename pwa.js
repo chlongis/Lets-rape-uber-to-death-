@@ -47,6 +47,9 @@
     ".pk .what,.ctak{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:3px}" +
     ".btn,button.go{box-shadow:3px 3px 0 #111!important}" +
     ".sitenav a{color:#0645AD!important;text-decoration:underline}" +
+    // One look for every picked toggle, and placeholders that don't pass for real values.
+    "button[aria-pressed=true]{background:#111!important;color:#fff!important;border-color:#111!important}" +
+    "::placeholder{color:#9a9a9a!important;font-weight:400!important;opacity:1}" +
     "body{font-family:Arial,Helvetica,sans-serif!important;-webkit-font-smoothing:auto!important}" +
     "input,select,textarea,button{font-family:Arial,Helvetica,sans-serif}" +
     "main p a,footer a,.note a,.sub a{text-decoration:underline;color:#2F6F9E}" +
