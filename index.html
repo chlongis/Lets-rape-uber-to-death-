@@ -254,6 +254,19 @@
 
 
 
+
+  .ticker{background:#111;color:#FFB020;overflow:hidden;white-space:nowrap;border-bottom:3px solid #C8553D;
+    font-family:Anton,Impact,sans-serif;font-size:17px;letter-spacing:.04em;padding:7px 0}
+  .ticker span{display:inline-block;padding-left:100%;animation:tick 38s linear infinite}
+  @keyframes tick{to{transform:translateX(-100%)}}
+  @media (prefers-reduced-motion:reduce){.ticker span{animation:none;padding-left:16px}}
+  .rant{padding-block:40px}
+  .rant h2{font-family:Anton,Impact,sans-serif;text-transform:uppercase;font-size:clamp(28px,4.4vw,44px);line-height:1;margin-bottom:16px}
+  .rant p{max-width:68ch;font-size:17px;line-height:1.55;margin-bottom:12px}
+  .rant .links{margin:0;padding-left:22px;max-width:76ch}
+  .rant .links li{font-size:17px;line-height:1.5;margin-bottom:14px}
+  .rant .links a{display:block;font-weight:700;font-size:19px}
+
   footer{padding-block:44px 64px;color:var(--text-3);font-size:13.5px}
   footer p{max-width:78ch;margin-bottom:10px;line-height:1.6}
   footer .disclaim{border-left:2px solid var(--accent);padding-left:14px;color:var(--text-2)}
@@ -280,156 +293,55 @@
 </header>
 
 <main>
+<div class="ticker" aria-hidden="true"><span>0% COMMISSION &nbsp;★&nbsp; KEEP THE WHOLE FARE &nbsp;★&nbsp; SCREENSHOT UR LOWBALLS &nbsp;★&nbsp; MN DELIVERY DRIVERS HAVE NO PAY FLOOR. NONE. &nbsp;★&nbsp; FUCK THE MIDDLEMAN &nbsp;★&nbsp; ITS FREE, NO CATCH &nbsp;★&nbsp; UR RATING SHOULD BE URS &nbsp;★&nbsp; 0% COMMISSION &nbsp;★&nbsp; KEEP THE WHOLE FARE &nbsp;★&nbsp;</span></div>
   <div class="hero wrap">
     <h1>Work for yourself,<br> <em>for real this time</em>.</h1>
-    <p class="hero-sub">Your rating is the most valuable thing you've got and you can't take it anywhere. It lives inside their app, and it's gone the day they deactivate you. <strong>Build one that's actually yours. Cut out the middleman.</strong></p>
-    <p class="hero-sub" style="margin-top:14px">Made by a dasher in the west metro. Not a company. No ads, no fees.</p>
+    <p class="hero-sub">ok so heres the deal. ur rating is the most valuable thing u got and u cant take it anywhere. it lives in their app and its gone the day they deactivate u. <strong>so make one thats actually urs and cut out the middleman.</strong></p>
+    <p class="hero-sub" style="margin-top:12px">made by a dasher in the west metro. not a company. no ads, no fees, im not making a dime off this.</p>
     <div class="herocta">
       <a class="btn" href="claim.html">Claim your profile</a>
       <a class="btn ghost" href="find.html">Find a driver</a>
     </div>
   </div>
 
-  <div class="pick wrap">
-    <h2>What are you here for?</h2>
-    <div class="picks">
-      <a class="pk" href="offer.html">
-        <span class="who">On shift right now</span>
-        <span class="what">Is this offer worth it?</span>
-        <span class="why">Screenshot it. Find out what it actually pays after gas before the timer runs out.</span>
-        <span class="go">Check an offer &rarr;</span>
-      </a>
-      <a class="pk" href="worst.html">
-        <span class="who">Just got lowballed</span>
-        <span class="what">Post your worst offer</span>
-        <span class="why">Put it on the wall of shame. The worst one each week gets posted every Monday.</span>
-        <span class="go">See the board &rarr;</span>
-      </a>
-      <a class="pk" href="claim.html">
-        <span class="who">I drive or deliver</span>
-        <span class="what">Get booked directly</span>
-        <span class="why">Your own page and link. People book you, you name the price, nobody skims off the top.</span>
-        <span class="go">Claim your profile &rarr;</span>
-      </a>
-      <a class="pk alt" href="board.html">
-        <span class="who">I need a ride or delivery</span>
-        <span class="what">Skip the middleman</span>
-        <span class="why">Post what you need and what you'll pay. A local driver grabs it and keeps every dollar.</span>
-        <span class="go">Post a job &rarr;</span>
-      </a>
-    </div>
-  </div>
-
-  <section class="wrap">
-    <div class="sec-head">
-      <h2>How it works</h2>
-    </div>
-    <div class="steps">
-      <div class="step">
-        <span class="n">1</span>
-        <h3>Make your page</h3>
-        <p>Rating, trips, car, area. Takes two minutes. Throw in a screenshot of your stats screen and it shows as verified.</p>
-      </div>
-      <div class="step">
-        <span class="n">2</span>
-        <h3>Give it out</h3>
-        <p>A link, a QR code for the back of the seat, a card you hand out, or straight into someone's contacts. Whatever works.</p>
-      </div>
-      <div class="step">
-        <span class="n">3</span>
-        <h3>Keep the money</h3>
-        <p>People reach you directly. You set the price and you keep all of it. Nobody takes a cut for an introduction they didn't make.</p>
-      </div>
-    </div>
+  <section class="wrap rant">
+    <h2>what u here for</h2>
+    <ul class="links">
+      <li><a href="offer.html">is this offer even worth it</a> screenshot the offer and itll tell u what ur actually making after gas. use it before u hit accept</li>
+      <li><a href="worst.html">worst offer of the week</a> got lowballed? post that shit. worst one gets posted every monday</li>
+      <li><a href="claim.html">make ur own driver profile</a> ur own page and link. ppl book u directly, u set the price, u keep all of it</li>
+      <li><a href="board.html">need a ride or a delivery?</a> post what u need and what ull pay. a local driver grabs it and keeps every dollar</li>
+    </ul>
   </section>
 
-  <section class="wrap">
-    <div class="sec-head">
-      <h2>Your rating is their leash</h2>
-      <p>The fee they take is for being the only ones who know you're good at this.</p>
-    </div>
-    <div class="facts">
-      <div class="fact">
-        <h3>It doesn't transfer</h3>
-        <p>Four years of five stars means jack shit the second you open a different app. That's on purpose. It keeps you stuck.</p>
-      </div>
-      <div class="fact alt">
-        <h3>One switch and it's gone</h3>
-        <p>An algorithm decides, there's often no real appeal, and everything you built goes with it. A record you own can't get switched off.</p>
-      </div>
-      <div class="fact">
-        <h3>So they set the cut</h3>
-        <p>As long as your history only exists in their app, they take whatever cut they feel like. A customer who can find you directly takes that to zero.</p>
-      </div>
-      <div class="fact alt">
-        <h3>Customers get screwed too</h3>
-        <p>Delivery fees keep climbing every year and drivers aren't the ones seeing that money.</p>
-      </div>
-    </div>
+  <section class="wrap rant">
+    <h2>why tho</h2>
+    <p>4 years of 5 stars means jack shit the second u open a different app. thats on purpose, it keeps u stuck.</p>
+    <p>one bad day with the algorithm and ur deactivated, usually no real appeal, and everything u built is just gone.</p>
+    <p>and the whole time theyre taking a fat cut for being the only ones who know ur good at this. if a customer can find u directly that cut goes to zero.</p>
+    <p>customers are getting fucked too btw. fees go up every year and drivers aint the ones seeing that money.</p>
   </section>
 
-  <section class="wrap">
-    <div class="paystrip">
-      <div>
-        <h3>On shift? Check it before you hit accept.</h3>
-        <p>The app shows you the payout. It doesn't show you the gas, the wear on your car, or the empty miles home. Screenshot the offer or punch it in and get Take it, Maybe or Skip, based on your car and your floor.</p>
-      </div>
-      <a class="btn" href="offer.html">Check an offer</a>
-    </div>
+  <section class="wrap rant">
+    <h2>is that shit even legal??</h2>
+    <p>in minnesota uber and lyft drivers have a pay floor: $1.28 a mile, 31 cents a minute, $5 minimum a trip. delivery drivers? nothing. zero. thats why doordash can legally send u some $3 for 12 miles bullshit here. seattle and nyc actually have one for delivery.</p>
+    <p><a href="paycheck.html">check if u got paid legally</a> (rideshare in MN, or delivery in seattle or nyc)</p>
   </section>
 
-  <section class="wrap">
-    <div class="paystrip">
-      <div>
-        <h3>Did they even pay you legally?</h3>
-        <p>Minnesota has a pay floor for rideshare. Seattle and New York City have one for delivery. Minnesota delivery drivers don't have one at all. Run a pay period through it and see if you got shorted, and who to file with if you did.</p>
-        <div class="rates">
-          <div><div class="v">$1.28</div><div class="k">per mile</div></div>
-          <div><div class="v">$0.31</div><div class="k">per minute</div></div>
-          <div><div class="v">$5.00</div><div class="k">per trip, minimum</div></div>
-        </div>
-      </div>
-      <a class="btn" href="paycheck.html">Check a pay period</a>
-    </div>
-  </section>
-
-  <section class="wrap">
-    <div class="sec-head">
-      <h2>More tools, all free</h2>
-    </div>
-    <div class="ctarow">
-      <a class="ctacard" href="board.html">
-        <span class="ctak">The job board</span>
-        <span class="ctad">Someone needs a ride or a delivery, names a price, and a driver claims it. No commission, no surge games. The money goes to whoever does the work.</span>
-        <span class="ctago">Open the board &rarr;</span>
-      </a>
-      <a class="ctacard alt" href="pledge.html">
-        <span class="ctak">Pledge your area</span>
-        <span class="ctad">Say where you'd drive. Nothing launches in a suburb until enough drivers sign up, so nobody shows up to a dead map.</span>
-        <span class="ctago">Add your name &rarr;</span>
-      </a>
-      <a class="ctacard alt" href="worst.html">
-        <span class="ctak">Worst offer of the week</span>
-        <span class="ctad">Got lowballed? Screenshot it and submit it. Everything's ranked by what it really pays per hour after gas.</span>
-        <span class="ctago">See this week's worst &rarr;</span>
-      </a>
-      <a class="ctacard" href="receipt.html">
-        <span class="ctak">Where the money went</span>
-        <span class="ctad">What the customer paid, what the food costs at the counter, what the driver got. Get a card showing what the app kept, ready to post.</span>
-        <span class="ctago">Make a receipt card &rarr;</span>
-      </a>
-      <a class="ctacard alt" href="deact.html">
-        <span class="ctak">Deactivation tracker</span>
-        <span class="ctad">Got switched off with no reason? Report it anonymously in 30 seconds and see how many other drivers got the same treatment.</span>
-        <span class="ctago">Add your report &rarr;</span>
-      </a>
-    </div>
+  <section class="wrap rant">
+    <h2>other shit thats on here</h2>
+    <ul class="links">
+      <li><a href="board.html">the job board</a> someone posts a ride or delivery and a price, a driver claims it. no commission no surge games</li>
+      <li><a href="pledge.html">pledge ur area</a> say where ud drive. nothing launches in a suburb until enough drivers sign up so nobody shows up to a dead map</li>
+      <li><a href="receipt.html">where the money went</a> what the customer paid vs what the food costs vs what the driver got. makes a card u can post</li>
+      <li><a href="deact.html">deactivation tracker</a> got switched off for no reason? report it anonymously, see how many other ppl got the same shit</li>
+    </ul>
   </section>
 </main>
 
 <footer class="wrap">
-  <p class="disclaim"><strong>Zilch takes no commission and doesn't arrange rides.</strong> Drivers make and own their profiles. Whatever you work out with a driver is between the two of you.</p>
-  <p>Pay figures from Minn. Stat. § 181C.03, RCW 49.46.300 and 35 RCNY § 59B-23. Rates change, so double-check before you rely on any of it. Not legal advice. The whole thing is open source, run your own copy if you want.</p>
+  <p class="disclaim"><strong>fine print:</strong> zilch doesnt take a cut and doesnt arrange rides. drivers make and own their profiles. whatever u work out with a driver is between u two.</p>
+  <p>pay numbers are from Minn. Stat. § 181C.03, RCW 49.46.300 and 35 RCNY § 59B-23. they change so double check before u rely on it. not legal advice. the whole thing is open source, steal it idc.</p>
 </footer>
 <script src="auth.js"></script>
 <script src="pwa.js"></script>
