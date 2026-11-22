@@ -179,6 +179,7 @@
   <div id="profile" hidden>
     <div class="phead">
       <span class="badge" id="badge">&mdash;</span>
+      <span class="badge self" id="svcBadge" hidden></span>
       <h1 id="pName">&mdash;</h1>
       <p class="vehicle" id="pVehicle">&mdash;</p>
       <p class="bio" id="pBio" hidden></p>
@@ -293,6 +294,8 @@
     var b = $("badge");
     b.className = "badge " + (verified ? "ok" : "self");
     b.textContent = verified ? "Verified record" : "Self-reported";
+    var SVC = {rides:"Rides", delivery:"Delivery", both:"Rides + delivery"};
+    if (SVC[d.service]){ $("svcBadge").textContent = SVC[d.service]; $("svcBadge").hidden = false; }
 
     $("pName").textContent = d.name;
     var areaLabel = AREAS[d.area] || d.area || "";

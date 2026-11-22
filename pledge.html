@@ -256,6 +256,13 @@
       </div>
 
       <div id="drvOnly" hidden>
+        <label class="fl" for="svc">What would you do?</label>
+        <select id="svc" style="margin-bottom:14px">
+          <option value="">Pick one</option>
+          <option value="rides">Rides (rideshare)</option>
+          <option value="delivery">Delivery (food, grocery)</option>
+          <option value="both">Both</option>
+        </select>
         <label class="fl" for="now">What do you drive for now?</label>
         <select id="now">
           <option value="">Prefer not to say</option>
@@ -457,6 +464,8 @@
     if (role === "driver"){
       var n = $("now").value;
       if (n) body.current_platform = n;
+      var sv = $("svc").value;
+      if (sv) body.service = sv;
     }
 
     var res = await sb.from("pledges").insert(body);

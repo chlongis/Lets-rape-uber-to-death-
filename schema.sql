@@ -33,6 +33,7 @@ create table if not exists drivers (
   contact_value text,                   -- public on purpose: it's the profile's contact button
   proof_path text,                      -- storage path of the stats screenshot
   verified text default 'self',         -- self | screenshot | email — set by the server only
+  service text check (service in ('rides', 'delivery', 'both')),  -- what the driver does
   created_at timestamptz default now()
 );
 
@@ -59,6 +60,7 @@ create table if not exists pledges (
   name text,
   night text,
   current_platform text,
+  service text check (service in ('rides', 'delivery', 'both')),
   created_at timestamptz default now()
 );
 
@@ -123,6 +125,8 @@ end $$;
 -- Old ownership keys were public, so they can't be trusted and aren't migrated.
 -- Profiles made before this change have no owner; delete or reassign them in the dashboard.
 alter table requests add column if not exists area text;   -- very old tables were made before this column existed
+alter table drivers  add column if not exists service text;
+alter table pledges  add column if not exists service text;
 alter table requests drop column if exists contact;
 alter table requests drop column if exists claimed_by;
 alter table requests drop column if exists posted_by;
@@ -203,7 +207,7 @@ begin
   if not zilch_proof_ok(v_handle, v_proof) then v_proof := null; end if;
 
   insert into drivers (handle, name, area, vehicle, bio, trips, rating, years,
-                       platform, contact_type, contact_value, proof_path, verified)
+                       platform, contact_type, contact_value, proof_path, verified, service)
   values (v_handle,
           left(trim(p->>'name'), 24),
           left(p->>'area', 30),
@@ -216,7 +220,8 @@ begin
           left(p->>'contact_type', 12),
           left(p->>'contact_value', 60),
           v_proof,
-          case when v_proof is not null then 'screenshot' else 'self' end)
+          case when v_proof is not null then 'screenshot' else 'self' end,
+          case when p->>'service' in ('rides', 'delivery', 'both') then p->>'service' end)
   returning id into v_id;
 
   insert into driver_owners (driver_id, owner_hash) values (v_id, zilch_hash(p_secret));
@@ -265,7 +270,8 @@ begin
     contact_type  = left(p->>'contact_type', 12),
     contact_value = left(p->>'contact_value', 60),
     proof_path    = v_proof,
-    verified      = v_verified
+    verified      = v_verified,
+    service       = case when p->>'service' in ('rides', 'delivery', 'both') then p->>'service' else d.service end
   where id = d.id;
   return true;
 end $$;

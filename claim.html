@@ -234,6 +234,15 @@
           <input type="number" id="fYears" min="0" max="30" step="1" placeholder="4">
         </div>
         <div class="field">
+          <label class="fl" for="fService">What you do</label>
+          <select id="fService">
+            <option value="">Pick one</option>
+            <option value="rides">Rides (rideshare)</option>
+            <option value="delivery">Delivery (food, grocery)</option>
+            <option value="both">Both</option>
+          </select>
+        </div>
+        <div class="field">
           <label class="fl" for="fPlatform">Where you drive</label>
           <select id="fPlatform">
             <option value="">Pick one</option>
@@ -349,7 +358,7 @@
       else { $("fArea").value = d.area || ""; } $("fVehicle").value = d.vehicle || "";
       $("fBio").value = d.bio || ""; $("fTrips").value = d.trips != null ? d.trips : "";
       $("fRating").value = d.rating != null ? d.rating : ""; $("fYears").value = d.years != null ? d.years : "";
-      $("fPlatform").value = d.platform || ""; $("fCType").value = d.contact_type || "text"; $("fCVal").value = d.contact_value || "";
+      $("fPlatform").value = d.platform || ""; $("fService").value = d.service || ""; $("fCType").value = d.contact_type || "text"; $("fCVal").value = d.contact_value || "";
       $("submit").textContent = "Save changes";
     })();
   }
@@ -383,10 +392,12 @@
     var rating  = parseFloat($("fRating").value);
     var years   = parseInt($("fYears").value, 10);
     var plat    = $("fPlatform").value;
+    var service = $("fService").value;
     var cval    = $("fCVal").value.trim().slice(0,60);
     var e = $("err");
 
     if (!name){ e.textContent = "First name is needed — it's what people remember."; return; }
+    if (!service){ e.textContent = "Pick whether you do rides, delivery or both."; return; }
     if (!area){ e.textContent = $("fArea").value === "other" ? "Type the city or neighborhood you drive in." : "Pick your main area."; return; }
     if (!vehicle){ e.textContent = "Add your vehicle so people can spot you."; return; }
     if (isNaN(trips) || trips < 0){ e.textContent = "Trip count is needed."; return; }
@@ -417,6 +428,7 @@
       rating: rating,
       years: isNaN(years) ? null : years,
       platform: plat || null,
+      service: service,
       contact_type: $("fCType").value,
       contact_value: cval,
       proof_path: proofPath
@@ -438,7 +450,7 @@
     var alreadyPledged = false;
     try { alreadyPledged = localStorage.getItem("zilch.pledged.v1") === "1"; } catch(err){}
     if (!alreadyPledged){
-      var pr = await sb.from("pledges").insert({role: "driver", area: area, name: name, current_platform: plat || null});
+      var pr = await sb.from("pledges").insert({role: "driver", area: area, name: name, current_platform: plat || null, service: service});
       if (!pr.error){ try { localStorage.setItem("zilch.pledged.v1", "1"); } catch(err){} }
     }
 

@@ -145,6 +145,11 @@
 
   <div class="searchbar">
     <input type="text" id="q" placeholder="Name, vehicle, or anything they wrote" autocomplete="off">
+    <select id="svcSel">
+      <option value="">Rides and delivery</option>
+      <option value="rides">Rides</option>
+      <option value="delivery">Delivery</option>
+    </select>
     <select id="areaSel">
       <option value="">Every area</option>
       <option value="waconia">Waconia</option>
@@ -199,8 +204,10 @@
 
     var term = $("q").value.trim().toLowerCase();
     var area = $("areaSel").value;
+    var svc = $("svcSel").value;
 
     var shown = rows.filter(function(d){
+      if (svc && d.service !== svc && d.service !== "both") return false;
       if (area === "other"){ if (d.area && AREAS[d.area] && d.area !== "other") return false; }
       else if (area && d.area !== area) return false;
       if (!term) return true;
@@ -230,7 +237,7 @@
           '<span class="dbadge ' + (verified ? "ok" : "self") + '">' +
             (verified ? "Verified" : "Self-reported") + '</span>' +
         '</div>' +
-        '<div class="dveh">' + esc([d.vehicle, AREAS[d.area] || d.area].filter(Boolean).join(" · ")) + '</div>' +
+        '<div class="dveh">' + esc([{rides:"Rides", delivery:"Delivery", both:"Rides + delivery"}[d.service], d.vehicle, AREAS[d.area] || d.area].filter(Boolean).join(" · ")) + '</div>' +
         '<div class="dstats">' +
           '<div class="dstat"><div class="n">' + Number(d.trips||0).toLocaleString("en-US") + '</div><div class="l">trips</div></div>' +
           '<div class="dstat"><div class="n">' + (d.rating ? Number(d.rating).toFixed(2) : "—") + '</div><div class="l">rating</div></div>' +
@@ -242,6 +249,7 @@
 
   $("q").addEventListener("input", render);
   $("areaSel").addEventListener("change", render);
+  $("svcSel").addEventListener("change", render);
 
   async function load(){
     var res = await sb.from("drivers").select("*")
