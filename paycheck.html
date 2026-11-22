@@ -221,9 +221,9 @@
 </div>
 
 <div class="intro wrap">
-  <span class="eyebrow">Minnesota &middot; Washington &middot; New York City</span>
+  <span class="eyebrow">Rideshare and delivery &middot; MN &middot; WA &middot; NYC</span>
   <h2>Were you paid what the law requires?</h2>
-  <p>Some states set a legal floor on what rideshare drivers get paid per passenger mile and minute. Pick where you drive and enter your numbers.</p>
+  <p>Some places set a legal floor on what rideshare and delivery drivers get paid. Pick what you drove and where, then enter your numbers from the weekly summary.</p>
 </div>
 
 <section class="wrap">
@@ -237,7 +237,7 @@
     <div class="inputs">
       <div>
         <label class="fl" for="period">Where and when</label>
-        <p class="sub">Rates and rules differ by state.</p>
+        <p class="sub">Rides and deliveries follow different laws. Pick the one you drove.</p>
         <select id="period">
           <optgroup label="Minnesota">
             <option value="mn26" selected>2025 or 2026</option>
@@ -251,23 +251,28 @@
             <option value="nyc">Standard vehicle &mdash; 2026</option>
             <option value="nycwav">Wheelchair-accessible &mdash; 2026</option>
           </optgroup>
+          <optgroup label="Food and grocery delivery">
+            <option value="mndel">Minnesota (DoorDash, Uber Eats, etc.)</option>
+            <option value="seadel">Seattle &mdash; 2026</option>
+            <option value="nycdel">New York City &mdash; from Apr 2026</option>
+          </optgroup>
         </select>
       </div>
 
-      <div>
-        <label class="fl" for="miles">Passenger miles</label>
-        <p class="sub">Rider in the car only. Not pickup, not waiting.</p>
+      <div id="boxMiles">
+        <label class="fl" for="miles" id="lblMiles">Passenger miles</label>
+        <p class="sub" id="subMiles">Rider in the car only. Not pickup, not waiting.</p>
         <input type="number" id="miles" min="0" step="0.1" placeholder="412.5">
       </div>
 
       <div>
-        <label class="fl" for="mins">Passenger minutes</label>
-        <p class="sub">Same. Rider in the car only.</p>
+        <label class="fl" for="mins" id="lblMins">Passenger minutes</label>
+        <p class="sub" id="subMins">Same. Rider in the car only.</p>
         <input type="number" id="mins" min="0" step="1" placeholder="960">
       </div>
 
-      <div>
-        <label class="fl" for="trips">Completed trips</label>
+      <div id="boxTrips">
+        <label class="fl" for="trips" id="lblTrips">Completed trips</label>
         <input type="number" id="trips" min="0" step="1" placeholder="78">
       </div>
 
@@ -279,7 +284,7 @@
 
       <div>
         <label class="fl" for="rate">Their take rate</label>
-        <p class="sub">Their share of what the rider paid. Set it to match your statements.</p>
+        <p class="sub" id="subRate">Their share of what the rider paid. Set it to match your statements.</p>
         <div class="rateval" id="rateOut">30%</div>
         <input type="range" id="rate" min="10" max="50" step="1" value="30" aria-label="Platform take rate percent">
       </div>
@@ -292,8 +297,8 @@
       </div>
 
       <div class="rows" id="rows" hidden>
-        <div class="row"><span class="k">Miles owed</span><span class="v" id="rMiles">—</span></div>
-        <div class="row"><span class="k">Minutes owed</span><span class="v" id="rMins">—</span></div>
+        <div class="row" id="rowMiles"><span class="k">Miles owed</span><span class="v" id="rMiles">—</span></div>
+        <div class="row"><span class="k" id="kMins">Minutes owed</span><span class="v" id="rMins">—</span></div>
         <div class="row" id="rowFloor"><span class="k">Per-trip floor check</span><span class="v" id="rFloor">—</span></div>
         <div class="row tot"><span class="k">Legal minimum for this period</span><span class="v" id="rReq">—</span></div>
         <div class="row"><span class="k">You were actually paid</span><span class="v" id="rPaid">—</span></div>
@@ -353,6 +358,10 @@
       <option value="">Which platform?</option>
       <option>Uber</option>
       <option>Lyft</option>
+      <option>DoorDash</option>
+      <option>Uber Eats</option>
+      <option>Grubhub</option>
+      <option>Instacart</option>
       <option>Other</option>
     </select>
     <button class="act" id="submit" disabled>Submit anonymously</button>
@@ -369,9 +378,9 @@
     <table class="lawtable">
       <thead><tr><th scope="col">Rule</th><th scope="col" id="lawRegion">Rate</th></tr></thead>
       <tbody>
-        <tr><td>Per passenger mile</td><td class="num" id="lawMile">&mdash;</td></tr>
-        <tr><td>Per passenger minute</td><td class="num" id="lawMin">&mdash;</td></tr>
-        <tr><td>Minimum per trip</td><td class="num" id="lawTrip">&mdash;</td></tr>
+        <tr><td id="lawMileK">Per passenger mile</td><td class="num" id="lawMile">&mdash;</td></tr>
+        <tr><td id="lawMinK">Per passenger minute</td><td class="num" id="lawMin">&mdash;</td></tr>
+        <tr><td id="lawTripK">Minimum per trip</td><td class="num" id="lawTrip">&mdash;</td></tr>
         <tr><td>Measured</td><td class="num" id="lawBasis">&mdash;</td></tr>
       </tbody>
     </table>
@@ -402,7 +411,14 @@
     nyc:     {mile:1.283, min:0.681, trip:0, basis:"trip", label:"New York City", cite:"35 RCNY \u00a7 59B-23",
               who:"NYC Taxi & Limousine Commission", tel:"311 (or 212-692-8294)", email:"nyc.gov/tlc"},
     nycwav:  {mile:1.601, min:0.681, trip:0, basis:"trip", label:"NYC \u2014 wheelchair-accessible", cite:"35 RCNY \u00a7 59B-23",
-              who:"NYC Taxi & Limousine Commission", tel:"311 (or 212-692-8294)", email:"nyc.gov/tlc"}
+              who:"NYC Taxi & Limousine Commission", tel:"311 (or 212-692-8294)", email:"nyc.gov/tlc"},
+    // Delivery. Minnesota's rideshare law (181C) covers passenger rides only; there is no delivery floor.
+    mndel:   {kind:"delivery", none:true, mile:0, min:0, trip:0, basis:"none", label:"Minnesota delivery", cite:"No delivery minimum (Minn. Stat. ch. 181C covers rideshare only)",
+              who:"Minnesota Department of Labor and Industry", tel:"651-284-5075", email:"dli.laborstandards@state.mn.us"},
+    seadel:  {kind:"delivery", mile:0.80, min:0.47, trip:5.34, basis:"trip", label:"Seattle delivery", cite:"SMC 8.37",
+              who:"Seattle Office of Labor Standards", tel:"206-256-5297", email:"laborstandards@seattle.gov"},
+    nycdel:  {kind:"delivery", hourly:22.13, mile:0, min:0, trip:0, basis:"hour", label:"NYC delivery", cite:"NYC delivery worker minimum pay rate (DCWP)",
+              who:"NYC Department of Consumer and Worker Protection", tel:"311, ask for \u201cDelivery Worker\u201d", email:"nyc.gov/DeliveryApps"}
   };
 
   var sb = window.supabase.createClient("https://zlvvtaydmaphdnhvmppj.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpsdnZ0YXlkbWFwaGRuaHZtcHBqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg5NzE3MTEsImV4cCI6MjEwNDU0NzcxMX0.t5ILb0-k3auW1Z3Em-gdR11rHURl5N-SVic9q1YDG7k");
@@ -418,14 +434,42 @@
   };
 
   function paintRegion(r){
+    var del = r.kind === "delivery", hour = r.basis === "hour";
+    $("lblMiles").textContent = del ? "Engaged miles" : "Passenger miles";
+    $("subMiles").textContent = del ? "From accepting the offer to drop-off, as your app reports them." : "Rider in the car only. Not pickup, not waiting.";
+    $("lblMins").textContent = hour ? "Minutes on deliveries" : (del ? "Engaged minutes" : "Passenger minutes");
+    $("subMins").textContent = hour ? "Time spent preparing and making deliveries this period." : (del ? "Same: from accepting to drop-off." : "Same. Rider in the car only.");
+    $("lblTrips").textContent = del ? "Completed offers" : "Completed trips";
+    $("subRate").textContent = del ? "Their share of what the customer paid. Set it to match your statements." : "Their share of what the rider paid. Set it to match your statements.";
+    $("boxMiles").hidden = hour || r.none;
+    $("boxTrips").hidden = hour || r.none;
+    $("lawMileK").textContent = del ? "Per engaged mile" : "Per passenger mile";
+    $("lawMinK").textContent = hour ? "Per hour on deliveries" : (del ? "Per engaged minute" : "Per passenger minute");
+    $("lawTripK").textContent = del ? "Minimum per offer" : "Minimum per trip";
     $("lawRegion").textContent = r.label;
+    if (r.none){
+      $("lawMile").textContent = "none"; $("lawMin").textContent = "none"; $("lawTrip").textContent = "none";
+      $("lawBasis").textContent = "No delivery floor";
+      $("lawNote").textContent = "Minnesota's driver pay law covers rideshare trips only. Food and grocery delivery apps have no legal pay floor here yet, so the only protection is turning down offers that don't pay. Use the offer check for that.";
+      $("cWho").textContent = r.who; $("cTel").textContent = r.tel; $("cEmail").textContent = r.email;
+      return;
+    }
+    if (hour){
+      $("lawMile").textContent = "\u2014"; $("lawMin").textContent = "$" + r.hourly.toFixed(2); $("lawTrip").textContent = "\u2014";
+      $("lawBasis").textContent = "Per pay period";
+      $("lawNote").textContent = "Restaurant and grocery delivery apps must pay at least this much per hour spent preparing and making deliveries, not counting tips. It rises every April 1.";
+      $("cWho").textContent = r.who; $("cTel").textContent = r.tel; $("cEmail").textContent = r.email;
+      return;
+    }
     $("lawMile").textContent = "$" + r.mile.toFixed(2);
     $("lawMin").textContent  = "$" + r.min.toFixed(2);
     $("lawTrip").textContent = r.trip > 0 ? "$" + r.trip.toFixed(2) : "none";
-    $("lawBasis").textContent = r.basis === "period" ? "Per pay period" : "Per trip";
+    $("lawBasis").textContent = r.basis === "period" ? "Per pay period" : (del ? "Per offer" : "Per trip");
     var note = r.basis === "period"
       ? "Measured across a pay period of up to 14 days, not trip by trip. Only time and miles with a rider in the car count. Tips are yours and don't count toward the minimum."
-      : "Measured on each individual trip, not averaged across the week. Only passenger time and miles count. Tips are yours and don't count toward the minimum.";
+      : del
+        ? "Each offer must pay the greater of the per-minute plus per-mile amount for its engaged time and miles, or the per-offer minimum, before tips. Measured offer by offer."
+        : "Measured on each individual trip, not averaged across the week. Only passenger time and miles count. Tips are yours and don't count toward the minimum.";
     if (r.trip === 0) note += " There is no flat per-trip floor here \u2014 the formula itself is the minimum, and the published rates already fold in the utilization rate.";
     $("lawNote").textContent = note;
     $("cWho").textContent = r.who;
@@ -441,8 +485,18 @@
     var trips = parseFloat($("trips").value);
     var paid  = parseFloat($("paid").value);
 
-    var have = [miles, mins, trips, paid].every(function(v){ return !isNaN(v) && v >= 0; });
     var v = $("verdict");
+    if (r.none){
+      v.className = "verdict idle";
+      $("vhead").textContent = "No legal minimum for delivery in Minnesota";
+      Array.prototype.forEach.call(document.querySelectorAll("#verdict .vamount"), function(n){ n.remove(); });
+      $("vsub").innerHTML = 'The state\u2019s pay floor covers rideshare only, so there\u2019s nothing to check a delivery pay period against. What you can do: skip offers that don\u2019t cover your car with the <a href="offer.html">offer check</a>, and log what you earn so the numbers exist when lawmakers take this up.';
+      $("rows").hidden = true; $("shortSec").hidden = true; $("cutBlock").hidden = true;
+      lastCalc = null; refreshSubmit();
+      return;
+    }
+    if (r.basis === "hour"){ miles = 0; trips = 0; }
+    var have = [miles, mins, trips, paid].every(function(v){ return !isNaN(v) && v >= 0; });
 
     if (!have){
       v.className = "verdict idle";
@@ -456,15 +510,19 @@
       return;
     }
 
-    var byRate = (miles * r.mile) + (mins * r.min);
+    var byRate = r.basis === "hour" ? (mins / 60) * r.hourly : (miles * r.mile) + (mins * r.min);
     var byFloor = trips * r.trip;
     var required = Math.max(byRate, byFloor);
     var diff = paid - required;
 
     $("rMiles").textContent = miles.toLocaleString("en-US",{maximumFractionDigits:1}) + " mi × " + usd(r.mile) + " = " + usd(miles * r.mile);
-    $("rMins").textContent  = mins.toLocaleString("en-US") + " min × " + usd(r.min) + " = " + usd(mins * r.min);
+    $("rowMiles").hidden = (r.basis === "hour");
+    $("kMins").textContent = r.basis === "hour" ? "Hours owed" : "Minutes owed";
+    $("rMins").textContent  = r.basis === "hour"
+      ? (mins / 60).toLocaleString("en-US",{maximumFractionDigits:2}) + " hr × " + usd(r.hourly) + " = " + usd(byRate)
+      : mins.toLocaleString("en-US") + " min × " + usd(r.min) + " = " + usd(mins * r.min);
     $("rowFloor").hidden = (r.trip === 0);
-    $("rFloor").textContent = trips.toLocaleString("en-US") + " trips × " + usd(r.trip) + " = " + usd(byFloor);
+    $("rFloor").textContent = trips.toLocaleString("en-US") + (r.kind === "delivery" ? " offers × " : " trips × ") + usd(r.trip) + " = " + usd(byFloor);
     $("rReq").textContent   = usd(required);
     $("rPaid").textContent  = usd(paid);
     $("rows").hidden = false;
@@ -479,7 +537,9 @@
       if (old.length > 1) old[0].remove();
       $("vsub").textContent = r.basis === "period"
         ? "short for this period, before tips. If they didn't make it up next cycle, you can file on it."
-        : "short across these trips, before tips. Washington measures each trip on its own, so individual trips may be short even when the total clears.";
+        : r.basis === "hour"
+          ? "short for this period, before tips. NYC lets you file with DCWP, and they keep your identity private unless you agree."
+          : "short across these " + (r.kind === "delivery" ? "offers" : "trips") + ", before tips. Each one is measured on its own, so individual ones may be short even when the total clears.";
       $("shortSec").hidden = false;
     } else {
       v.className = "verdict ok";
@@ -495,7 +555,7 @@
     var riderPaid = paid / (1 - t);
     var kept = riderPaid - paid;
     $("cutAmt").textContent = usd(kept);
-    $("cutExp").textContent = "At a " + Math.round(t*100) + "% take rate, your riders paid about " +
+    $("cutExp").textContent = "At a " + Math.round(t*100) + "% take rate, your " + (r.kind === "delivery" ? "customers" : "riders") + " paid about " +
       usd(riderPaid) + " this period and " + usd(kept) + " of it never reached you. Legal, unlike a shortfall above — just expensive.";
     $("cutBlock").hidden = false;
 
