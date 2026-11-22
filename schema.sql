@@ -181,6 +181,36 @@ begin
   return encode(sha256(convert_to(p_secret, 'UTF8')), 'hex');
 end $$;
 
+-- Who is calling. Signed in: their account. Not signed in: their browser key.
+-- A browser key can never pose as an account ("user:" is reserved).
+create or replace function zilch_me(p_secret text) returns text
+language plpgsql stable set search_path = public, auth as $$
+begin
+  if auth.uid() is not null then
+    return zilch_hash('user:' || auth.uid()::text);
+  end if;
+  if p_secret like 'user:%' then raise exception 'bad secret'; end if;
+  return zilch_hash(p_secret);
+end $$;
+
+-- First sign-in on a browser: move everything that browser owns to the account.
+create or replace function link_browser(p_secret text) returns integer
+language plpgsql security definer set search_path = public, auth as $$
+declare v_old text; v_new text; n integer := 0; c integer;
+begin
+  if auth.uid() is null then raise exception 'sign in first'; end if;
+  if p_secret is null or length(p_secret) < 32 or p_secret like 'user:%' then return 0; end if;
+  v_old := zilch_hash(p_secret);
+  v_new := zilch_hash('user:' || auth.uid()::text);
+  update driver_owners   set owner_hash   = v_new where owner_hash   = v_old; get diagnostics c = row_count; n := n + c;
+  update request_private set poster_hash  = v_new where poster_hash  = v_old; get diagnostics c = row_count; n := n + c;
+  update request_private set claimer_hash = v_new where claimer_hash = v_old; get diagnostics c = row_count; n := n + c;
+  if not exists (select 1 from payout_accounts where owner_hash = v_new) then
+    update payout_accounts set owner_hash = v_new where owner_hash = v_old; get diagnostics c = row_count; n := n + c;
+  end if;
+  return n;
+end $$;
+
 -- A profile counts as screenshot-verified only if the file really exists in
 -- the proof bucket and is named after this profile's handle.
 create or replace function zilch_proof_ok(p_handle text, p_path text) returns boolean
@@ -224,7 +254,7 @@ begin
           case when p->>'service' in ('rides', 'delivery', 'both') then p->>'service' end)
   returning id into v_id;
 
-  insert into driver_owners (driver_id, owner_hash) values (v_id, zilch_hash(p_secret));
+  insert into driver_owners (driver_id, owner_hash) values (v_id, zilch_me(p_secret));
   return v_handle;
 end $$;
 
@@ -241,7 +271,7 @@ declare
 begin
   select dr.* into d from drivers dr
     join driver_owners o on o.driver_id = dr.id
-   where dr.handle = p_handle and o.owner_hash = zilch_hash(p_secret);
+   where dr.handle = p_handle and o.owner_hash = zilch_me(p_secret);
   if not found then return false; end if;
 
   if coalesce(trim(p->>'name'), '') = '' then raise exception 'name required'; end if;
@@ -282,7 +312,7 @@ declare v_id uuid;
 begin
   select dr.id into v_id from drivers dr
     join driver_owners o on o.driver_id = dr.id
-   where dr.handle = p_handle and o.owner_hash = zilch_hash(p_secret);
+   where dr.handle = p_handle and o.owner_hash = zilch_me(p_secret);
   if not found then return false; end if;
   delete from drivers where id = v_id;   -- driver_owners row cascades
   return true;
@@ -311,7 +341,7 @@ begin
   returning id into v_id;
 
   insert into request_private (request_id, contact, poster_hash)
-  values (v_id, left(nullif(trim(p->>'contact'), ''), 80), zilch_hash(p_secret));
+  values (v_id, left(nullif(trim(p->>'contact'), ''), 80), zilch_me(p_secret));
   return v_id;
 end $$;
 
@@ -327,7 +357,7 @@ begin
    where id = p_id and status = 'open';
   if not found then raise exception 'taken'; end if;
 
-  update request_private set claimer_hash = zilch_hash(p_secret)
+  update request_private set claimer_hash = zilch_me(p_secret)
    where request_id = p_id
   returning contact into v_contact;
   return v_contact;
@@ -338,14 +368,14 @@ create or replace function my_claims(p_secret text)
 returns table (request_id uuid, contact text)
 language sql stable security definer set search_path = public as $$
   select rp.request_id, rp.contact from request_private rp
-   where rp.claimer_hash = zilch_hash(p_secret);
+   where rp.claimer_hash = zilch_me(p_secret);
 $$;
 
 -- Which of these handles belong to this browser (for showing edit/delete).
 create or replace function owns_driver(p_secret text, p_handle text) returns boolean
 language sql stable security definer set search_path = public as $$
   select exists (select 1 from drivers dr join driver_owners o on o.driver_id = dr.id
-                  where dr.handle = p_handle and o.owner_hash = zilch_hash(p_secret));
+                  where dr.handle = p_handle and o.owner_hash = zilch_me(p_secret));
 $$;
 
 revoke all on function zilch_proof_ok(text, text) from public, anon, authenticated;
@@ -396,8 +426,8 @@ alter table payout_accounts enable row level security;
 -- Which side of a job this secret is on: 'poster', 'driver' or null.
 create or replace function zilch_role(p_secret text, p_request uuid) returns text
 language sql stable security definer set search_path = public as $$
-  select case when rp.poster_hash  = zilch_hash(p_secret) then 'poster'
-              when rp.claimer_hash = zilch_hash(p_secret) then 'driver' end
+  select case when rp.poster_hash  = zilch_me(p_secret) then 'poster'
+              when rp.claimer_hash = zilch_me(p_secret) then 'driver' end
     from request_private rp where rp.request_id = p_request;
 $$;
 
@@ -406,11 +436,11 @@ create or replace function my_jobs(p_secret text)
 returns table (request_id uuid, role text, contact text, driver_payable boolean)
 language sql stable security definer set search_path = public as $$
   select rp.request_id,
-         case when rp.poster_hash = zilch_hash(p_secret) then 'poster' else 'driver' end,
-         case when rp.claimer_hash = zilch_hash(p_secret) then rp.contact end,
+         case when rp.poster_hash = zilch_me(p_secret) then 'poster' else 'driver' end,
+         case when rp.claimer_hash = zilch_me(p_secret) then rp.contact end,
          exists (select 1 from payout_accounts pa where pa.owner_hash = rp.claimer_hash and pa.ready)
     from request_private rp
-   where rp.poster_hash = zilch_hash(p_secret) or rp.claimer_hash = zilch_hash(p_secret);
+   where rp.poster_hash = zilch_me(p_secret) or rp.claimer_hash = zilch_me(p_secret);
 $$;
 
 create or replace function send_message(p_secret text, p_request uuid, p_body text) returns bigint
@@ -440,7 +470,7 @@ $$;
 create or replace function my_payout(p_secret text) returns text
 language sql stable security definer set search_path = public as $$
   select case when pa.ready then 'ready' else 'started' end
-    from payout_accounts pa where pa.owner_hash = zilch_hash(p_secret);
+    from payout_accounts pa where pa.owner_hash = zilch_me(p_secret);
 $$;
 
 -- The rest are called only by the Edge Functions, which use the service role.
@@ -511,6 +541,8 @@ revoke all on function zilch_role(text, uuid), my_jobs(text), send_message(text,
 grant execute on function my_jobs(text), send_message(text, uuid, text),
   get_messages(text, uuid, bigint), my_payout(text) to anon, authenticated;
 revoke all on function zilch_role(text, uuid) from anon, authenticated;
+revoke all on function link_browser(text) from public, anon;
+grant execute on function link_browser(text) to authenticated;
 
 do $$
 declare f text;

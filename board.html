@@ -314,6 +314,7 @@
         <a href="receipt.html">Receipts</a>
         <a href="deact.html">Deactivations</a>
         <a href="paycheck.html">Pay check</a>
+        <a href="account.html">Sign in</a>
       </nav>
     </div>
     <div class="modes" role="group" aria-label="Switch between posting and driving">
@@ -468,6 +469,7 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="auth.js"></script>
 <script>
 (function(){
   "use strict";
@@ -537,6 +539,11 @@
       return;
     }
     bar.className = "payout";
+    if (!zilchAuth.session){
+      bar.innerHTML = "<span><b>Get paid by card.</b> Sign in first, so your payouts follow you to any device.</span>" +
+        '<a class="sbtn pri" href="' + zilchAuth.signInUrl("board.html") + '">Sign in</a>';
+      return;
+    }
     bar.innerHTML = (payoutState === "started"
         ? "<span><b>Finish payout setup</b> so posters can pay you by card.</span>"
         : "<span><b>Get paid by card.</b> Connect a free Stripe payout account. Zilch takes nothing.</span>") +
@@ -915,10 +922,12 @@
   });
 
   render();
-  load();
 
   var qs = new URLSearchParams(location.search);
-  loadPayout(qs.has("payouts"));
+  zilchAuth.attach(sb, secret).then(function(){
+    load();
+    loadPayout(qs.has("payouts"));
+  });
   if (qs.has("paid")){
     var note = document.createElement("div");
     note.className = "payout on";

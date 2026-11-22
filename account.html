@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0E1620">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Zilch">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Sign in — Zilch</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+  :root{
+    --paper:#EEF1F4; --surface:#FFFFFF; --surface-2:#E4E9EE;
+    --line:#C8D2DA; --line-soft:#DCE3E9;
+    --text:#0E1620; --text-2:#4A5A68; --text-3:#738796;
+    --accent:#FFB020; --accent-ink:#8A5300;
+    --ok:#1E8A5C; --ok-bg:#D8F0E4; --warn:#A8402B;
+    --shadow:0 1px 2px rgba(14,22,32,.05), 0 6px 18px -10px rgba(14,22,32,.16);
+    --radius:4px;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --paper:#0B1219; --surface:#121C26; --surface-2:#18242F;
+      --line:#2A3946; --line-soft:#1E2C38;
+      --text:#E8EEF3; --text-2:#A3B4C1; --text-3:#6F8494;
+      --accent:#FFB020; --accent-ink:#FFC65C;
+      --ok:#4FCB92; --ok-bg:#123528; --warn:#E5806A;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.7);
+    }
+  }
+  *{box-sizing:border-box}
+  [hidden]{display:none!important}
+  body{margin:0;background:var(--paper);color:var(--text);font-family:"IBM Plex Sans","Segoe UI",Helvetica,Arial,sans-serif;font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+  h1,h2,p{margin:0}
+  .wrap{max-width:520px;margin:0 auto;padding:0 18px}
+  .eyebrow{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:10.5px;letter-spacing:.15em;text-transform:uppercase;font-weight:600;color:var(--text-3)}
+  .top{border-bottom:1px solid var(--line);background:var(--surface)}
+  .top-in{max-width:1180px;margin:0 auto;padding:12px 18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .wordmark{font-family:Anton,Impact,sans-serif;font-size:23px;letter-spacing:.02em;text-transform:uppercase;line-height:1;color:var(--text);text-decoration:none}
+  .wordmark span{color:var(--accent-ink)}
+  .sitenav{display:flex;gap:3px;align-items:center;flex-wrap:wrap}
+  .sitenav a{font-size:13px;font-weight:600;text-decoration:none;padding:7px 12px;color:var(--text-2);border:1px solid transparent;border-radius:3px}
+  .sitenav a:hover{color:var(--text);border-color:var(--line)}
+  .sitenav a[aria-current="page"]{color:var(--text);background:var(--surface-2);border-color:var(--line)}
+  .intro{padding:40px 0 22px}
+  .intro h1{font-family:Anton,Impact,sans-serif;text-transform:uppercase;font-size:clamp(34px,8vw,52px);line-height:.98;margin-top:12px}
+  .intro h1 em{font-style:normal;color:var(--accent-ink)}
+  .intro p{margin-top:14px;font-size:16px;color:var(--text-2)}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px;margin-bottom:16px}
+  label{display:block;font-size:13px;font-weight:600;margin-bottom:6px}
+  input[type=email]{font:inherit;font-size:16px;padding:12px;width:100%;background:var(--surface);color:var(--text);border:1px solid var(--line);border-radius:var(--radius)}
+  input:focus-visible,button:focus-visible{outline:2px solid var(--accent-ink);outline-offset:1px}
+  .go{font-family:Anton,Impact,sans-serif;text-transform:uppercase;letter-spacing:.045em;font-size:18px;padding:14px;cursor:pointer;width:100%;margin-top:12px;background:var(--accent);color:#0E1620;border:1px solid var(--accent);border-radius:var(--radius)}
+  .go:disabled{opacity:.45;cursor:default}
+  .btn{font:inherit;font-size:14px;font-weight:600;padding:10px 16px;cursor:pointer;background:var(--surface);color:var(--text);border:1px solid var(--line);border-radius:var(--radius);text-decoration:none;display:inline-block}
+  .msg{font-size:14px;color:var(--text-2);margin-top:12px;min-height:1.2em}
+  .msg.err{color:var(--warn)}
+  .who{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:15px;word-break:break-all;margin:6px 0 14px}
+  .note{font-size:13px;color:var(--text-3);line-height:1.55}
+  .row{display:flex;gap:10px;flex-wrap:wrap}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="top-in">
+    <a class="wordmark" href="index.html">Zil<span>ch</span></a>
+    <nav class="sitenav">
+      <a href="index.html">The pitch</a>
+      <a href="find.html">Find a driver</a>
+      <a href="claim.html">Claim profile</a>
+      <a href="board.html">Board</a>
+      <a href="offer.html">Offer check</a>
+      <a href="receipt.html">Receipts</a>
+      <a href="deact.html">Deactivations</a>
+      <a href="paycheck.html">Pay check</a>
+      <a href="account.html" aria-current="page">Account</a>
+    </nav>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="intro">
+    <span class="eyebrow">No password</span>
+    <h1>One account, <em>every device</em>.</h1>
+    <p>Type your email and tap the link we send you. Your profile, jobs, chats and payouts follow you to any phone or computer.</p>
+  </div>
+
+  <div class="card" id="outBox">
+    <label for="email">Email</label>
+    <input type="email" id="email" autocomplete="email" inputmode="email" placeholder="you@example.com">
+    <button class="go" id="send">Email me a sign-in link</button>
+    <p class="msg" id="msg"></p>
+  </div>
+
+  <div class="card" id="inBox" hidden>
+    <span class="eyebrow">Signed in as</span>
+    <p class="who" id="who"></p>
+    <p class="note" id="linkNote" style="margin-bottom:14px">Anything you made on this browser before signing in is now on your account.</p>
+    <div class="row">
+      <a class="btn" id="nextBtn" href="claim.html">Your driver profile</a>
+      <a class="btn" href="board.html">Job board</a>
+      <button class="btn" id="out">Sign out</button>
+    </div>
+  </div>
+
+  <p class="note">We only use your email to sign you in. It isn't shown on your profile or shared with anyone.</p>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="auth.js"></script>
+<script>
+(function(){
+  "use strict";
+  var $ = function(id){ return document.getElementById(id); };
+  var sb = window.supabase.createClient("https://zlvvtaydmaphdnhvmppj.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpsdnZ0YXlkbWFwaGRuaHZtcHBqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg5NzE3MTEsImV4cCI6MjEwNDU0NzcxMX0.t5ILb0-k3auW1Z3Em-gdR11rHURl5N-SVic9q1YDG7k");
+  var secret = null;
+  try { secret = localStorage.getItem("zilch.secret.v1"); } catch(e){}
+
+  var next = new URLSearchParams(location.search).get("next") || "";
+  if (!/^[a-z]+\.html(\?[^\s]*)?$/.test(next)) next = "";   // only our own pages
+
+  function paint(s){
+    $("outBox").hidden = !!s;
+    $("inBox").hidden = !s;
+    if (s){
+      $("who").textContent = s.user.email || "";
+      if (next){ $("nextBtn").href = next; $("nextBtn").textContent = "Continue"; }
+    }
+  }
+
+  zilchAuth.attach(sb, secret).then(function(s){
+    paint(s);
+    if (s && next) location.replace(next);
+  });
+  sb.auth.onAuthStateChange(function(evt, s){
+    paint(s);
+    if (evt === "SIGNED_IN" && s){
+      zilchAuth.attach(sb, secret).then(function(){ if (next) location.replace(next); });
+    }
+  });
+
+  $("send").addEventListener("click", async function(){
+    var email = $("email").value.trim();
+    var m = $("msg");
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ m.className = "msg err"; m.textContent = "That doesn't look like an email address."; return; }
+    $("send").disabled = true; m.className = "msg"; m.textContent = "Sending…";
+    var back = location.origin + location.pathname + (next ? "?next=" + encodeURIComponent(next) : "");
+    var res = await sb.auth.signInWithOtp({email: email, options: {emailRedirectTo: back}});
+    $("send").disabled = false;
+    if (res.error){
+      m.className = "msg err";
+      m.textContent = /rate|limit|seconds/i.test(res.error.message) ? "Too many emails just now. Wait a minute and try again." : "Couldn't send the link. Try again in a moment.";
+      return;
+    }
+    m.textContent = "Check your email for a link from Zilch (look in spam too). Open it on this device to finish signing in.";
+  });
+  $("email").addEventListener("keydown", function(e){ if (e.key === "Enter") $("send").click(); });
+
+  $("out").addEventListener("click", async function(){ await sb.auth.signOut(); paint(null); });
+})();
+</script>
+<script src="pwa.js"></script>
+</body>
+</html>

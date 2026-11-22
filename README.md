@@ -59,6 +59,14 @@ You need a free [Supabase](https://supabase.com) account and a GitHub account. N
 
 The site is a progressive web app. On Android, Chrome offers an **Install** button; on iPhone, Safari's Share → **Add to Home Screen**. It opens full-screen with its own icon, and the offer check and receipt card keep working with no signal (`sw.js` caches the pages; database calls are never cached). `pwa.js` handles the install prompt and the phone nav.
 
+## Accounts
+
+Sign-in is by email link (Supabase Auth, no passwords) on `account.html`. Creating a driver profile and setting up payouts need an account; browsing, the tools and the job board work without one.
+
+Ownership is checked by `zilch_me()` in `schema.sql`: a signed-in person's account, otherwise the browser key. The first time someone signs in on a browser, `link_browser()` moves everything that browser's key owned onto the account. The payments function reads the account from the request's login token.
+
+Setup in Supabase: **Authentication → URL Configuration**, set the Site URL to your GitHub Pages address and add `https://<you>.github.io/<repo>/**` to Redirect URLs. Supabase's built-in email sender only allows a few emails an hour; before launch, add your own SMTP under **Authentication → Emails** (Resend and similar have free tiers).
+
 ## Card payments (Stripe) and messages
 
 **Messages** work as soon as you run the latest `schema.sql`. Once a driver claims a job, the poster and the driver each get a **Messages** button on the card. Only those two can read the thread.
@@ -93,7 +101,7 @@ Setup, about 20 minutes:
 
 **Sales tax:** Stripe Tax is not switched on. With direct charges the driver is the seller, so any tax obligation is theirs, not Zilch's. Whether a ride or delivery fee is taxable depends on the state; have a tax advisor confirm before turning on `automatic_tax`, and remember it only collects where an active registration exists.
 
-Payout accounts are tied to the browser that set them up, like profiles. A driver who clears their browser data would have to connect again.
+Payouts need an account, so they follow the driver to any device.
 
 ## How some of it works
 
@@ -124,7 +132,6 @@ Sources: Minn. Stat. § 181C.03, RCW 49.46.300, 35 RCNY § 59B-23.
 
 ## Not built yet
 
-- Accounts and identity
 - DKIM-verified stats — driver forwards their weekly platform summary as an attachment, a worker validates the signature against the platform's DNS key, and the numbers become near-unfakeable. Needs a domain and a mail worker.
 
 ---

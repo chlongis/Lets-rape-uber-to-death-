@@ -160,6 +160,7 @@
       <a href="receipt.html">Receipts</a>
       <a href="deact.html">Deactivations</a>
       <a href="paycheck.html">Pay check</a>
+      <a href="account.html">Sign in</a>
     </nav>
   </div>
 </div>
@@ -169,6 +170,12 @@
     <span class="eyebrow">For drivers</span>
     <h1>Your record.<br>Your <em>name</em>.</h1>
     <p>Six thousand trips at 4.97 and none of it is yours — it lives in an app you don't control and disappears the day they deactivate you. Build a profile you own and hand out to anyone.</p>
+  </div>
+
+  <div class="card" id="gate" hidden>
+    <h2>Sign in first</h2>
+    <p class="sub">Your profile is tied to your account, so you can edit it from any phone or computer and nobody else can.</p>
+    <a class="go" id="gateLink" href="account.html?next=claim.html" style="display:block;text-align:center;text-decoration:none">Sign in with email</a>
   </div>
 
   <div class="form" id="form">
@@ -326,6 +333,7 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="auth.js"></script>
 <script>
 (function(){
   "use strict";
@@ -346,8 +354,17 @@
   // ?edit=<handle> opens the form prefilled for a profile this browser owns.
   var editHandle = (new URLSearchParams(location.search).get("edit") || "").trim().slice(0,40);
   var editing = null;
+  var ready = zilchAuth.attach(sb, secret).then(function(sess){
+    if (!sess){
+      $("form").classList.add("hide");
+      $("gate").hidden = false;
+      $("gateLink").href = zilchAuth.signInUrl();
+    }
+    return sess;
+  });
   if (editHandle){
     (async function(){
+      if (!(await ready)) return;
       var own = await sb.rpc("owns_driver", {p_secret: secret, p_handle: editHandle});
       if (own.error || !own.data){ $("err").textContent = "This browser didn't create that profile, so it can't edit it."; return; }
       var res = await sb.from("drivers").select("*").eq("handle", editHandle).limit(1);

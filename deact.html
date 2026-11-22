@@ -113,6 +113,7 @@
       <a href="receipt.html">Receipts</a>
       <a href="deact.html" aria-current="page">Deactivations</a>
       <a href="paycheck.html">Pay check</a>
+      <a href="account.html">Sign in</a>
     </nav>
   </div>
 </div>
@@ -221,11 +222,13 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="auth.js"></script>
 <script>
 (function(){
   "use strict";
   var $ = function(id){ return document.getElementById(id); };
   var sb = window.supabase.createClient("https://zlvvtaydmaphdnhvmppj.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpsdnZ0YXlkbWFwaGRuaHZtcHBqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg5NzE3MTEsImV4cCI6MjEwNDU0NzcxMX0.t5ILb0-k3auW1Z3Em-gdR11rHURl5N-SVic9q1YDG7k");
+  zilchAuth.attach(sb, null);
 
   var REASONS = {none:"No reason given", ratings:"Low ratings", acceptance:"Acceptance rate", fraud:"“Fraud”",
     background:"Background check", safety:"Safety report", id_check:"ID check", other:"Something else"};

@@ -34,11 +34,21 @@ Deno.serve(async (req) => {
   try { body = await req.json(); } catch { return json({ error: "bad json" }, 400); }
 
   const action = String(body.action ?? "");
-  const secret = String(body.secret ?? "");
   const requestId = body.request_id ? String(body.request_id) : "";
-  if (secret.length < 32) return json({ error: "bad secret" }, 400);
+
+  // Who is asking: a signed-in account if the request carries a user token,
+  // otherwise the browser key. Matches zilch_me() in schema.sql.
+  const token = (req.headers.get("Authorization") ?? "").replace(/^Bearer\s+/i, "");
+  const { data: who } = token ? await db.auth.getUser(token) : { data: { user: null } };
+  const userId = who?.user?.id ?? null;
+  const browserKey = String(body.secret ?? "");
+  if (!userId && (browserKey.length < 32 || browserKey.startsWith("user:"))) return json({ error: "bad secret" }, 400);
+  const secret = userId ? `user:${userId}` : browserKey;
 
   try {
+    if ((action === "onboard" || action === "status") && !userId) {
+      return json({ error: "Sign in to set up payouts." }, 401);
+    }
     if (action === "onboard" || action === "status") {
       let { data: account } = await db.rpc("pay_get_account", { p_secret: secret });
 
