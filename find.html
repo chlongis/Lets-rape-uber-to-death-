@@ -144,7 +144,7 @@
       <option value="msp">MSP Airport</option>
       <option value="minneapolis">Minneapolis</option>
       <option value="stpaul">Saint Paul</option>
-      <option value="other">Elsewhere in the metro</option>
+      <option value="other">Somewhere else</option>
     </select>
   </div>
 
@@ -189,7 +189,8 @@
     var area = $("areaSel").value;
 
     var shown = rows.filter(function(d){
-      if (area && d.area !== area) return false;
+      if (area === "other"){ if (d.area && AREAS[d.area] && d.area !== "other") return false; }
+      else if (area && d.area !== area) return false;
       if (!term) return true;
       var hay = [d.name, d.vehicle, d.bio, AREAS[d.area] || d.area, d.platform]
         .filter(Boolean).join(" ").toLowerCase();

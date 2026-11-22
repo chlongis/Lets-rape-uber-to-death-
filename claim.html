@@ -182,8 +182,9 @@
             <option value="msp">MSP Airport</option>
             <option value="minneapolis">Minneapolis</option>
             <option value="stpaul">Saint Paul</option>
-            <option value="other">Elsewhere in the metro</option>
+            <option value="other">Somewhere else</option>
           </select>
+          <input type="text" id="fAreaOther" maxlength="30" placeholder="City or neighborhood, e.g. Chaska" autocomplete="off" hidden style="margin-top:8px">
         </div>
       </div>
 
@@ -320,13 +321,21 @@
       var res = await sb.from("drivers").select("*").eq("handle", editHandle).limit(1);
       if (res.error || !res.data || !res.data.length) return;
       var d = editing = res.data[0];
-      $("fName").value = d.name || ""; $("fArea").value = d.area || ""; $("fVehicle").value = d.vehicle || "";
+      $("fName").value = d.name || ""; var known = Array.prototype.some.call($("fArea").options, function(o){ return o.value && o.value !== "other" && o.value === d.area; });
+      if (d.area && !known){ $("fArea").value = "other"; $("fAreaOther").hidden = false; $("fAreaOther").value = d.area === "other" ? "" : d.area; }
+      else { $("fArea").value = d.area || ""; } $("fVehicle").value = d.vehicle || "";
       $("fBio").value = d.bio || ""; $("fTrips").value = d.trips != null ? d.trips : "";
       $("fRating").value = d.rating != null ? d.rating : ""; $("fYears").value = d.years != null ? d.years : "";
       $("fPlatform").value = d.platform || ""; $("fCType").value = d.contact_type || "text"; $("fCVal").value = d.contact_value || "";
       $("submit").textContent = "Save changes";
     })();
   }
+
+  $("fArea").addEventListener("change", function(){
+    var other = $("fArea").value === "other";
+    $("fAreaOther").hidden = !other;
+    if (other) $("fAreaOther").focus();
+  });
 
   var proofFile = null;
   $("fProof").addEventListener("change", function(e){
@@ -345,6 +354,7 @@
   $("submit").addEventListener("click", async function(){
     var name    = $("fName").value.trim().slice(0,24);
     var area    = $("fArea").value;
+    if (area === "other") area = $("fAreaOther").value.trim().replace(/\s+/g, " ").slice(0,30);
     var vehicle = $("fVehicle").value.trim().slice(0,50);
     var trips   = parseInt($("fTrips").value, 10);
     var rating  = parseFloat($("fRating").value);
@@ -354,7 +364,7 @@
     var e = $("err");
 
     if (!name){ e.textContent = "First name is needed — it's what riders remember."; return; }
-    if (!area){ e.textContent = "Pick your main area."; return; }
+    if (!area){ e.textContent = $("fArea").value === "other" ? "Type the city or neighborhood you drive in." : "Pick your main area."; return; }
     if (!vehicle){ e.textContent = "Add your vehicle so riders can spot you."; return; }
     if (isNaN(trips) || trips < 0){ e.textContent = "Trip count is needed."; return; }
     if (isNaN(rating) || rating < 1 || rating > 5){ e.textContent = "Rating should be between 1 and 5."; return; }
