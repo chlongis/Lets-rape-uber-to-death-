@@ -26,7 +26,7 @@
 <meta name="twitter:image" content="https://chlongis.github.io/UberBoober/icons/share.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Permanent+Marker&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&display=swap">
 <style>
   :root{
     --paper:#EEF1F4;
@@ -253,42 +253,6 @@
   .pk .go{margin-top:auto;padding-top:6px;font-size:14px;font-weight:600;color:var(--accent-ink)}
 
 
-  /* ---- chaos ---- */
-  .marker{font-family:"Permanent Marker","Comic Sans MS",cursive;font-weight:400;text-transform:none;letter-spacing:0}
-  .ticker{background:#0E1620;color:#FFB020;overflow:hidden;white-space:nowrap;border-bottom:3px solid #C8553D;
-    font-family:Anton,Impact,sans-serif;font-size:17px;letter-spacing:.04em;padding:7px 0}
-  .ticker span{display:inline-block;padding-left:100%;animation:tick 38s linear infinite}
-  @keyframes tick{to{transform:translateX(-100%)}}
-  .hero{position:relative}
-  .stamp{position:absolute;right:6%;top:46px;width:150px;height:150px;border-radius:50%;
-    border:5px solid #C8553D;color:#C8553D;display:flex;align-items:center;justify-content:center;text-align:center;
-    font-family:Anton,Impact,sans-serif;font-size:26px;line-height:1;transform:rotate(14deg);opacity:.9;
-    box-shadow:inset 0 0 0 4px var(--paper),inset 0 0 0 7px #C8553D}
-  @media (max-width:900px){.stamp{width:96px;height:96px;font-size:16px;right:14px;top:18px;border-width:3px}}
-  .hl{background:#FFE14D;padding:0 4px;color:#0E1620!important;
-    box-decoration-break:clone;-webkit-box-decoration-break:clone}
-  .scrawl{display:inline-block;color:#C8553D;font-size:20px;transform:rotate(-4deg);margin-left:10px}
-  .note-tape{display:inline-block;margin-top:26px;background:#FFF5B8;color:#3a2e00;padding:12px 16px 12px;
-    transform:rotate(-2.2deg);font-size:19px;position:relative;box-shadow:2px 3px 0 rgba(0,0,0,.18)}
-  .note-tape::before{content:"";position:absolute;top:-10px;left:40%;width:70px;height:20px;background:rgba(200,210,220,.7);transform:rotate(3deg)}
-  .picks .pk:nth-child(1){transform:rotate(-1.4deg)}
-  .picks .pk:nth-child(2){transform:rotate(1.1deg) translateY(6px)}
-  .picks .pk:nth-child(3){transform:rotate(-.6deg) translateY(-4px)}
-  .picks .pk:nth-child(4){transform:rotate(1.8deg)}
-  .pk:hover{transform:rotate(0) scale(1.03)!important;transition:transform .12s}
-  .pick h2{transform:rotate(-1deg);display:inline-block}
-  .steps .step:nth-child(2){transform:rotate(.8deg)}
-  .steps .step:nth-child(3){transform:rotate(-1.2deg)}
-  .sec-head h2 .marker{color:#C8553D;font-size:.62em;display:inline-block;transform:rotate(-6deg);margin-left:10px;vertical-align:middle}
-  .facts .fact:nth-child(odd){transform:rotate(-.5deg)}
-  .facts .fact:nth-child(even){transform:rotate(.7deg)}
-  .strikeout{text-decoration:line-through;text-decoration-color:#C8553D;text-decoration-thickness:3px}
-  .paystrip{border:3px dashed var(--line)!important}
-  .ctarow .ctacard:nth-child(odd){transform:rotate(-.7deg)}
-  .ctarow .ctacard:nth-child(even){transform:rotate(.9deg)}
-  .circle{position:relative;white-space:nowrap}
-  .circle::after{content:"";position:absolute;left:-8px;right:-8px;top:-6px;bottom:-6px;border:3px solid #C8553D;border-radius:50%;transform:rotate(-3deg);pointer-events:none}
-  @media (prefers-reduced-motion:reduce){.ticker span{animation:none;padding-left:16px}}
 
   footer{padding-block:44px 64px;color:var(--text-3);font-size:13.5px}
   footer p{max-width:78ch;margin-bottom:10px;line-height:1.6}
@@ -316,12 +280,10 @@
 </header>
 
 <main>
-<div class="ticker" aria-hidden="true"><span>0% COMMISSION &nbsp;★&nbsp; KEEP THE WHOLE FARE &nbsp;★&nbsp; SCREENSHOT YOUR LOWBALLS &nbsp;★&nbsp; YOUR RATING SHOULD BE YOURS &nbsp;★&nbsp; DELIVERY DRIVERS IN MN HAVE NO PAY FLOOR. NONE. &nbsp;★&nbsp; FREE. ACTUALLY FREE. &nbsp;★&nbsp; 0% COMMISSION &nbsp;★&nbsp; KEEP THE WHOLE FARE &nbsp;★&nbsp;</span></div>
   <div class="hero wrap">
-    <div class="stamp">0%<br>CUT<br>EVER</div>
     <h1>Work for yourself,<br> <em>for real this time</em>.</h1>
-    <p class="hero-sub">Your rating is the most valuable thing you've got and you can't take it anywhere. It lives inside their app, and it's gone the day they deactivate you. <strong><span class="hl">Build one that's actually yours. Cut out the middleman.</span></strong></p>
-    <div class="note-tape marker">made by a dasher, not a company. no ads, no fees, no catch.</div>
+    <p class="hero-sub">Your rating is the most valuable thing you've got and you can't take it anywhere. It lives inside their app, and it's gone the day they deactivate you. <strong>Build one that's actually yours. Cut out the middleman.</strong></p>
+    <p class="hero-sub" style="margin-top:14px">Made by a dasher in the west metro. Not a company. No ads, no fees.</p>
     <div class="herocta">
       <a class="btn" href="claim.html">Claim your profile</a>
       <a class="btn ghost" href="find.html">Find a driver</a>
@@ -329,7 +291,7 @@
   </div>
 
   <div class="pick wrap">
-    <h2>What are you here for??</h2>
+    <h2>What are you here for?</h2>
     <div class="picks">
       <a class="pk" href="offer.html">
         <span class="who">On shift right now</span>
@@ -360,7 +322,7 @@
 
   <section class="wrap">
     <div class="sec-head">
-      <h2>How it works <span class="marker">(it's easy i swear)</span></h2>
+      <h2>How it works</h2>
     </div>
     <div class="steps">
       <div class="step">
@@ -383,13 +345,13 @@
 
   <section class="wrap">
     <div class="sec-head">
-      <h2>Your rating is <span class="circle">their</span> leash</h2>
+      <h2>Your rating is their leash</h2>
       <p>The fee they take is for being the only ones who know you're good at this.</p>
     </div>
     <div class="facts">
       <div class="fact">
         <h3>It doesn't transfer</h3>
-        <p>Four years of five stars means <span class="strikeout">nothing</span> jack shit the second you open a different app. That's on purpose. It keeps you stuck.</p>
+        <p>Four years of five stars means jack shit the second you open a different app. That's on purpose. It keeps you stuck.</p>
       </div>
       <div class="fact alt">
         <h3>One switch and it's gone</h3>
@@ -419,7 +381,7 @@
   <section class="wrap">
     <div class="paystrip">
       <div>
-        <h3>Did they even pay you legally? <span class="marker scrawl">← check this</span></h3>
+        <h3>Did they even pay you legally?</h3>
         <p>Minnesota has a pay floor for rideshare. Seattle and New York City have one for delivery. Minnesota delivery drivers don't have one at all. Run a pay period through it and see if you got shorted, and who to file with if you did.</p>
         <div class="rates">
           <div><div class="v">$1.28</div><div class="k">per mile</div></div>
@@ -433,7 +395,7 @@
 
   <section class="wrap">
     <div class="sec-head">
-      <h2>More tools, all free <span class="marker">(yes really)</span></h2>
+      <h2>More tools, all free</h2>
     </div>
     <div class="ctarow">
       <a class="ctacard" href="board.html">

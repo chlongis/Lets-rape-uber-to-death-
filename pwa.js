@@ -32,8 +32,21 @@
   var base = document.createElement("style");
   base.textContent =
     // Plain, homemade look: everyday fonts, flat boxes, normal links.
-    ":root,:root[data-theme]{--shadow:none!important}" +
-    ".wordmark{display:inline-block;transform:rotate(-3deg)}" +
+    // Raw look: white page, black text, hard black borders, blue links.
+    ":root,:root[data-theme]{--shadow:none!important;--paper:#fff!important;--surface:#fff!important;--surface-2:#efefef!important;" +
+    "--line:#111!important;--line-soft:#bbb!important;--text:#111!important;--text-2:#222!important;--text-3:#555!important;" +
+    "--accent-ink:#B35C00!important;--ice:#0645AD!important;--ice-bg:#E8EEFA!important;--radius:0px!important;color-scheme:light}" +
+    "*{border-radius:0!important}" +
+    "body{background:#fff!important;color:#111!important}" +
+    "a{color:#0645AD}" +
+    ".hero,section,.pick,.masthead,.top,footer{border-color:#111!important}" +
+    ".masthead,.top{border-bottom-width:2px!important}" +
+    ".step,.ctacard,.pk,.paystrip,.panel,.card,.box,.fact{border-width:2px!important}" +
+    ".pk,.ctacard{border-top-width:2px!important;border-left-width:2px!important}" +
+    ".pk .go,.ctago,.pk .what,.ctak{color:#0645AD!important}.pk .go,.ctago{text-decoration:underline}" +
+    ".pk .what,.ctak{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:3px}" +
+    ".btn,button.go{box-shadow:3px 3px 0 #111!important}" +
+    ".sitenav a{color:#0645AD!important;text-decoration:underline}" +
     "body{font-family:Arial,Helvetica,sans-serif!important;-webkit-font-smoothing:auto!important}" +
     "input,select,textarea,button{font-family:Arial,Helvetica,sans-serif}" +
     "main p a,footer a,.note a,.sub a{text-decoration:underline;color:#2F6F9E}" +
