@@ -33,6 +33,7 @@
   base.textContent =
     // Plain, homemade look: everyday fonts, flat boxes, normal links.
     ":root,:root[data-theme]{--shadow:none!important}" +
+    ".wordmark{display:inline-block;transform:rotate(-3deg)}" +
     "body{font-family:Arial,Helvetica,sans-serif!important;-webkit-font-smoothing:auto!important}" +
     "input,select,textarea,button{font-family:Arial,Helvetica,sans-serif}" +
     "main p a,footer a,.note a,.sub a{text-decoration:underline;color:#2F6F9E}" +
