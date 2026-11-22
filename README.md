@@ -55,6 +55,10 @@ You need a free [Supabase](https://supabase.com) account and a GitHub account. N
 
 ---
 
+## Install it like an app
+
+The site is a progressive web app. On Android, Chrome offers an **Install** button; on iPhone, Safari's Share → **Add to Home Screen**. It opens full-screen with its own icon, and the offer check and receipt card keep working with no signal (`sw.js` caches the pages; database calls are never cached). `pwa.js` handles the install prompt and the phone nav.
+
 ## How some of it works
 
 **Nothing secret is in a public table.** The anon key is public, so anything it can read is public. Job-post contact details and ownership records live in private tables with no policies, and every write goes through a `SECURITY DEFINER` function in `schema.sql`. Each browser makes a random secret (`zilch.secret.v1` in localStorage) and only its SHA-256 hash is stored. Holding the secret is what lets you edit or delete your profile and see the contact for jobs you claimed. Clear your browser data and you lose that access.
