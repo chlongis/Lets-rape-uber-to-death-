@@ -31,10 +31,15 @@
 
   var base = document.createElement("style");
   base.textContent =
+    // Plain, homemade look: everyday fonts, flat boxes, normal links.
+    ":root,:root[data-theme]{--shadow:none!important}" +
+    "body{font-family:Arial,Helvetica,sans-serif!important;-webkit-font-smoothing:auto!important}" +
+    "input,select,textarea,button{font-family:Arial,Helvetica,sans-serif}" +
+    "main p a,footer a,.note a,.sub a{text-decoration:underline;color:#2F6F9E}" +
     ".eyebrow{font-family:inherit!important;text-transform:none!important;letter-spacing:0!important;" +
     "font-size:13.5px!important;font-weight:600!important;color:var(--text-2)!important}" +
     ".sitenav{position:relative}" +
-    ".znav-btn{font:600 13px/1 'IBM Plex Sans',Helvetica,Arial,sans-serif;cursor:pointer;padding:8px 13px;border-radius:3px;" +
+    ".znav-btn{font:700 13px/1 Arial,Helvetica,sans-serif;cursor:pointer;padding:8px 13px;border-radius:3px;" +
     "border:1px solid var(--line);background:var(--surface);color:var(--text);display:inline-flex;align-items:center;gap:7px}" +
     ".znav-btn:hover{border-color:var(--text-3)}.znav-btn:focus-visible{outline:2px solid var(--accent-ink);outline-offset:2px}" +
     ".znav-btn i{display:inline-block;width:14px;height:10px;background:linear-gradient(currentColor 0 0) 0 0/100% 2px no-repeat," +
@@ -43,7 +48,7 @@
     "background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);border-radius:4px;padding:18px;" +
     "display:grid;grid-template-columns:1fr 1fr;gap:18px 22px}" +
     ".znav-panel[hidden]{display:none}" +
-    ".znav-panel h4{margin:0 0 6px;font:600 13px/1.2 'IBM Plex Sans',Helvetica,Arial,sans-serif;letter-spacing:0;color:var(--text-3)}" +
+    ".znav-panel h4{margin:0 0 6px;font:700 13px/1.2 Arial,Helvetica,sans-serif;letter-spacing:0;color:var(--text-3)}" +
     ".sitenav .znav-panel a{display:block;padding:7px 8px;margin:0 -8px;border:0;border-radius:3px;text-decoration:none;color:var(--text);font-size:14.5px;font-weight:600;line-height:1.25}" +
     ".sitenav .znav-panel a small{display:block;font-weight:400;font-size:12.5px;color:var(--text-2);margin-top:2px}" +
     ".sitenav .znav-panel a:hover,.sitenav .znav-panel a[aria-current=page]{background:var(--surface-2)}" +
@@ -111,7 +116,7 @@
   css.textContent =
     ".zinstall{position:fixed;left:12px;right:12px;bottom:12px;z-index:9999;display:flex;align-items:center;gap:10px;" +
     "max-width:520px;margin:0 auto;padding:12px 12px 12px 14px;background:#0E1620;color:#E8EEF3;border:1px solid #2A3946;" +
-    "border-radius:6px;box-shadow:0 10px 30px -10px rgba(0,0,0,.6);font:500 14px/1.4 'IBM Plex Sans',Helvetica,Arial,sans-serif}" +
+    "border-radius:6px;box-shadow:0 10px 30px -10px rgba(0,0,0,.6);font:14px/1.4 Arial,Helvetica,sans-serif}" +
     ".zinstall img{width:34px;height:34px;border-radius:7px;flex:0 0 auto}" +
     ".zinstall p{margin:0;flex:1}.zinstall b{color:#FFB020}" +
     ".zinstall button{font:inherit;font-weight:600;cursor:pointer;border-radius:4px;padding:9px 12px;border:1px solid #FFB020}" +
