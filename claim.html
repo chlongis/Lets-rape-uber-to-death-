@@ -422,6 +422,15 @@
 
     if (editing){ location.href = "d.html?h=" + encodeURIComponent(handle); return; }
 
+    // A new driver profile also counts as a driver pledge for their area,
+    // unless this browser already pledged on the pledge page.
+    var alreadyPledged = false;
+    try { alreadyPledged = localStorage.getItem("zilch.pledged.v1") === "1"; } catch(err){}
+    if (!alreadyPledged){
+      var pr = await sb.from("pledges").insert({role: "driver", area: area, name: name, current_platform: plat || null});
+      if (!pr.error){ try { localStorage.setItem("zilch.pledged.v1", "1"); } catch(err){} }
+    }
+
     try {
       var mine = JSON.parse(localStorage.getItem("zilch.profiles.v1") || "[]");
       mine.push(handle);
