@@ -21,8 +21,9 @@
     }
   };
   function paintNav(){
-    var a = document.querySelector('.sitenav a[href="account.html"]');
-    if (a && !a.hasAttribute("aria-current")) a.textContent = api.session ? "Account" : "Sign in";
+    Array.prototype.forEach.call(document.querySelectorAll('.sitenav a[href="account.html"]'), function(a){
+      if (!a.hasAttribute("aria-current")) a.textContent = api.session ? "Account" : "Sign in";
+    });
   }
   window.zilchAuth = api;
   // Pages without a database client still show "Account" when signed in.

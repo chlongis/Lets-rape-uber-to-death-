@@ -942,6 +942,7 @@
   render();
 
   var qs = new URLSearchParams(location.search);
+  if (qs.has("drive")) setMode("drive");
   zilchAuth.attach(sb, secret).then(function(){
     load();
     loadPayout(qs.has("payouts"));
