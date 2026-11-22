@@ -132,11 +132,11 @@
   .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);flex:none}
 
   /* hero */
-  .hero{padding-block:74px 58px;border-bottom:1px solid var(--line)}
+  .hero{padding-block:40px 34px;border-bottom:1px solid var(--line)}
   .hero h1{
     font-family:Anton,Impact,sans-serif;
     text-transform:uppercase;
-    font-size:clamp(44px,8.8vw,108px);
+    font-size:clamp(40px,6.4vw,76px);
     line-height:.93;
     letter-spacing:.005em;
     margin-top:0;
@@ -267,6 +267,10 @@
   .rant .links li{font-size:17px;line-height:1.5;margin-bottom:14px}
   .rant .links a{display:block;font-weight:700;font-size:19px}
 
+
+  .wkbox{border:2px solid #111;padding:16px 18px;max-width:560px;font-size:17px;line-height:1.5}
+  .wkbox .big{font-family:Anton,Impact,sans-serif;font-size:44px;line-height:1;color:#B3261E;display:block;margin-bottom:6px}
+
   footer{padding-block:44px 64px;color:var(--text-3);font-size:13.5px}
   footer p{max-width:78ch;margin-bottom:10px;line-height:1.6}
   footer .disclaim{border-left:2px solid var(--accent);padding-left:14px;color:var(--text-2)}
@@ -298,11 +302,13 @@
     <h1>Work for yourself,<br> <em>for real this time</em>.</h1>
     <p class="hero-sub">ok so heres the deal. ur rating is the most valuable thing u got and u cant take it anywhere. it lives in their app and its gone the day they deactivate u. <strong>so make one thats actually urs and cut out the middleman.</strong></p>
     <p class="hero-sub" style="margin-top:12px">made by a dasher in the west metro. not a company. no ads, no fees, im not making a dime off this.</p>
-    <div class="herocta">
-      <a class="btn" href="claim.html">Claim your profile</a>
-      <a class="btn ghost" href="find.html">Find a driver</a>
-    </div>
   </div>
+
+  <section class="wrap rant" id="wk">
+    <h2>worst offer this week</h2>
+    <div class="wkbox" id="wkBox">loading...</div>
+    <p style="margin-top:12px"><a href="worst.html">see the whole board / post urs</a></p>
+  </section>
 
   <section class="wrap rant">
     <h2>what u here for</h2>
@@ -343,5 +349,30 @@
   <p class="disclaim"><strong>fine print:</strong> zilch doesnt take a cut and doesnt arrange rides. drivers make and own their profiles. whatever u work out with a driver is between u two.</p>
   <p>pay numbers are from Minn. Stat. § 181C.03, RCW 49.46.300 and 35 RCNY § 59B-23. they change so double check before u rely on it. not legal advice. the whole thing is open source, steal it idc.</p>
 </footer>
+<script>
+(function(){
+  var URL = "https://zlvvtaydmaphdnhvmppj.supabase.co/rest/v1/worst_offers";
+  var KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpsdnZ0YXlkbWFwaGRuaHZtcHBqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg5NzE3MTEsImV4cCI6MjEwNDU0NzcxMX0.t5ILb0-k3auW1Z3Em-gdR11rHURl5N-SVic9q1YDG7k";
+  var box = document.getElementById("wkBox");
+  var d = new Date(); d.setHours(0,0,0,0); d.setDate(d.getDate() - ((d.getDay() + 6) % 7));
+  function money(n){ n = Number(n); return (n < 0 ? "-$" : "$") + Math.abs(n).toFixed(2); }
+  function q(since){
+    return fetch(URL + "?select=platform,payout,miles,minutes,per_hour&order=per_hour.asc&limit=1" + (since ? "&created_at=gte." + since : ""),
+      {headers:{apikey:KEY, Authorization:"Bearer " + KEY}}).then(function(r){ return r.json(); });
+  }
+  q(d.toISOString()).then(function(rows){
+    if (rows && rows.length) return [rows, true];
+    return q(null).then(function(all){ return [all, false]; });
+  }).then(function(res){
+    var r = res[0] && res[0][0];
+    if (!r){ box.innerHTML = "nothing yet this week. <a href=\"worst.html\">be the first</a>"; return; }
+    var t = document.createElement("div");
+    var big = document.createElement("span"); big.className = "big"; big.textContent = money(r.per_hour) + "/hr";
+    t.appendChild(big);
+    t.appendChild(document.createTextNode((r.platform || "Some app") + " offered " + money(r.payout) + " for " + Number(r.miles) + " miles, " + Number(r.minutes) + " min. thats what it pays after gas" + (res[1] ? "." : " (all time worst, nobodys posted one this week yet).")));
+    box.textContent = ""; box.appendChild(t);
+  }).catch(function(){ box.innerHTML = "<a href=\"worst.html\">see the board</a>"; });
+})();
+</script>
 <script src="auth.js"></script>
 <script src="pwa.js"></script>
