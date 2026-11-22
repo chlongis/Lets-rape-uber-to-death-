@@ -1,9 +1,9 @@
 // Zilch service worker. Makes the site installable and keeps the offer
 // check and receipt card working with no signal. Database calls (Supabase)
 // always go to the network and are never cached.
-var VERSION = "zilch-v3";
+var VERSION = "zilch-v4";
 var CORE = [
-  "./", "./index.html", "./offer.html", "./receipt.html", "./board.html", "./find.html",
+  "./", "./index.html", "./offer.html", "./worst.html", "./receipt.html", "./board.html", "./find.html",
   "./claim.html", "./d.html", "./deact.html", "./paycheck.html", "./pledge.html",
   "./pwa.js", "./auth.js", "./account.html", "./offer-parse.js", "./manifest.webmanifest", "./icons/icon-192.png", "./icons/icon-512.png"
 ];

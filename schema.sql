@@ -595,6 +595,62 @@ begin
 end $$;
 
 -- ---------------------------------------------------------------
+-- Worst Offer of the Week
+-- ---------------------------------------------------------------
+-- Drivers submit their most insulting offer with a screenshot. The numbers
+-- are public; the screenshot is kept private (it can show addresses) as proof.
+-- Car cost uses one fixed estimate so every entry is ranked the same way:
+-- 25 mpg at $3.00/gal plus $0.15/mi wear = $0.27 a mile.
+create table if not exists worst_offers (
+  id uuid primary key default gen_random_uuid(),
+  platform text not null check (platform in ('DoorDash','Uber Eats','Grubhub','Instacart','Uber','Lyft','Spark','Other')),
+  area text check (area is null or length(area) <= 30),
+  payout numeric not null check (payout >= 0 and payout <= 500),
+  miles numeric not null check (miles > 0 and miles <= 200),
+  minutes numeric not null check (minutes > 0 and minutes <= 600),
+  car_cost numeric generated always as (round(miles * 0.27, 2)) stored,
+  net numeric generated always as (round(payout - miles * 0.27, 2)) stored,
+  per_hour numeric generated always as (round((payout - miles * 0.27) / (minutes / 60.0), 2)) stored,
+  per_mile numeric generated always as (round(payout / miles, 2)) stored,
+  shot_path text not null,
+  hidden boolean not null default false,   -- set true in the dashboard to take an entry down
+  created_at timestamptz default now()
+);
+alter table worst_offers enable row level security;
+drop policy if exists "read worst offers" on worst_offers;
+create policy "read worst offers" on worst_offers for select using (not hidden);
+-- The screenshot path is not public: grant every column except it.
+revoke select on worst_offers from anon, authenticated;
+revoke insert, update, delete on worst_offers from anon, authenticated;
+grant select (id, platform, area, payout, miles, minutes, car_cost, net, per_hour, per_mile, created_at)
+  on worst_offers to anon, authenticated;
+
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values ('offers', 'offers', false, 5242880, array['image/jpeg','image/png','image/webp','image/heic'])
+on conflict (id) do nothing;
+drop policy if exists "upload offers" on storage.objects;
+create policy "upload offers" on storage.objects for insert with check (bucket_id = 'offers');
+
+-- Only counts with a screenshot that really landed in the bucket.
+create or replace function submit_worst_offer(p jsonb) returns uuid
+language plpgsql security definer set search_path = public, storage as $$
+declare v_id uuid; v_path text := p->>'shot_path';
+begin
+  if v_path is null or v_path !~ '^w-[a-z0-9-]{8,60}\.(jpg|jpeg|png|webp|heic)$'
+     or not exists (select 1 from storage.objects where bucket_id = 'offers' and name = v_path) then
+    raise exception 'screenshot required';
+  end if;
+  if exists (select 1 from worst_offers where shot_path = v_path) then raise exception 'already submitted'; end if;
+  insert into worst_offers (platform, area, payout, miles, minutes, shot_path)
+  values (p->>'platform', left(nullif(p->>'area', ''), 30),
+          (p->>'payout')::numeric, (p->>'miles')::numeric, (p->>'minutes')::numeric, v_path)
+  returning id into v_id;
+  return v_id;
+end $$;
+revoke all on function submit_worst_offer(jsonb) from public;
+grant execute on function submit_worst_offer(jsonb) to anon, authenticated;
+
+-- ---------------------------------------------------------------
 -- Realtime (public tables only — the private ones are never broadcast)
 -- ---------------------------------------------------------------
 do $$

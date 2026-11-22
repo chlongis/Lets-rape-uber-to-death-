@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0E1620">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Zilch">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Worst Offer of the Week | Zilch</title>
+<meta name="description" content="Drivers submit the most insulting delivery and rideshare offers they get, with a screenshot. Ranked by what they pay per hour after gas.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Zilch">
+<meta property="og:title" content="Worst Offer of the Week | Zilch">
+<meta property="og:description" content="The offers the apps hope you don't screenshot, ranked by what they really pay per hour after gas.">
+<meta property="og:url" content="https://chlongis.github.io/UberBoober/worst.html">
+<meta property="og:image" content="https://chlongis.github.io/UberBoober/icons/share.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Worst Offer of the Week | Zilch">
+<meta name="twitter:description" content="The offers the apps hope you don't screenshot, ranked by what they really pay per hour after gas.">
+<meta name="twitter:image" content="https://chlongis.github.io/UberBoober/icons/share.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+  :root{
+    --paper:#EEF1F4; --surface:#FFFFFF; --surface-2:#E4E9EE;
+    --line:#C8D2DA; --line-soft:#DCE3E9;
+    --text:#0E1620; --text-2:#4A5A68; --text-3:#738796;
+    --accent:#FFB020; --accent-ink:#8A5300; --accent-bg:#FCEBC7;
+    --warn:#A8402B; --warn-bg:#F7DFD8;
+    --shadow:0 1px 2px rgba(14,22,32,.05), 0 6px 18px -10px rgba(14,22,32,.16);
+    --radius:4px;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --paper:#0B1219; --surface:#121C26; --surface-2:#18242F;
+      --line:#2A3946; --line-soft:#1E2C38;
+      --text:#E8EEF3; --text-2:#A3B4C1; --text-3:#6F8494;
+      --accent:#FFB020; --accent-ink:#FFC65C; --accent-bg:#3A2C10;
+      --warn:#E5806A; --warn-bg:#3A1E1A;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.7);
+    }
+  }
+  *{box-sizing:border-box}
+  [hidden]{display:none!important}
+  body{margin:0;background:var(--paper);color:var(--text);font-family:"IBM Plex Sans","Segoe UI",Helvetica,Arial,sans-serif;font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+  h1,h2,h3,p{margin:0}
+  .wrap{max-width:760px;margin:0 auto;padding:0 18px}
+  .mono{font-family:"IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
+  .eyebrow{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:10.5px;letter-spacing:.15em;text-transform:uppercase;font-weight:600;color:var(--text-3)}
+  .top{border-bottom:1px solid var(--line);background:var(--surface)}
+  .top-in{max-width:1180px;margin:0 auto;padding:12px 18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .wordmark{font-family:Anton,Impact,sans-serif;font-size:23px;letter-spacing:.02em;text-transform:uppercase;line-height:1;color:var(--text);text-decoration:none}
+  .wordmark span{color:var(--accent-ink)}
+  .sitenav{display:flex;gap:3px;align-items:center;flex-wrap:wrap}
+  .sitenav a{font-size:13px;font-weight:600;text-decoration:none;padding:7px 12px;color:var(--text-2);border:1px solid transparent;border-radius:3px}
+  .sitenav a:hover{color:var(--text);border-color:var(--line)}
+  .sitenav a[aria-current="page"]{color:var(--text);background:var(--surface-2);border-color:var(--line)}
+  .intro{padding:32px 0 22px}
+  .intro h1{font-family:Anton,Impact,sans-serif;text-transform:uppercase;font-size:clamp(32px,7vw,54px);line-height:.98;margin:12px 0 0}
+  .intro h1 em{font-style:normal;color:var(--warn)}
+  .intro p{margin-top:14px;max-width:58ch;font-size:16px;color:var(--text-2)}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;margin-bottom:16px}
+  .card h2{font-size:16px;font-weight:600;margin-bottom:3px}
+  .card .sub{font-size:13px;color:var(--text-3);margin-bottom:14px}
+
+  .champ{border:2px solid var(--warn);background:var(--warn-bg)}
+  .champ .tag{display:inline-block;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--warn)}
+  .champ .big{font-family:Anton,Impact,sans-serif;font-size:clamp(44px,11vw,76px);line-height:.95;color:var(--warn);margin-top:10px}
+  .champ .what{font-size:17px;font-weight:600;margin-top:10px}
+  .champ .math{font-size:14px;color:var(--text-2);margin-top:4px}
+  .champ .empty{font-size:15px;color:var(--text-2);margin-top:8px}
+
+  .tabs{display:flex;gap:6px;margin-bottom:12px}
+  .tabs button{font:inherit;font-size:13px;font-weight:600;padding:7px 12px;cursor:pointer;border-radius:3px;background:transparent;color:var(--text-2);border:1px solid var(--line)}
+  .tabs button[aria-pressed="true"]{background:var(--surface-2);color:var(--text)}
+  .row{display:grid;grid-template-columns:28px 1fr auto;gap:12px;align-items:center;padding:11px 0;border-top:1px solid var(--line-soft)}
+  .row:first-child{border-top:0}
+  .rk{font-family:"IBM Plex Mono",ui-monospace,monospace;font-weight:600;color:var(--text-3)}
+  .rw{font-weight:600;font-size:14.5px}
+  .rm{font-size:12.5px;color:var(--text-3)}
+  .rv{text-align:right}
+  .rv .ph{font-family:"IBM Plex Mono",ui-monospace,monospace;font-weight:600;font-size:16px;color:var(--warn)}
+  .rv .sh{font:inherit;font-size:12px;font-weight:600;padding:4px 8px;margin-top:4px;cursor:pointer;background:transparent;color:var(--text-2);border:1px solid var(--line);border-radius:3px}
+  .none{color:var(--text-3);font-size:14px}
+
+  label.fl{display:block;font-size:12.5px;font-weight:600;margin-bottom:5px;color:var(--text-2)}
+  input,select{font:inherit;font-size:16px;padding:9px 11px;width:100%;background:var(--surface);color:var(--text);border:1px solid var(--line);border-radius:var(--radius)}
+  input[type=number]{font-family:"IBM Plex Mono",ui-monospace,monospace;font-weight:600;font-size:18px}
+  input.filled{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-bg)}
+  input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid var(--accent-ink);outline-offset:1px}
+  .grid{display:grid;gap:12px;grid-template-columns:1fr 1fr 1fr}
+  .grid2{display:grid;gap:12px;grid-template-columns:1fr 1fr;margin-bottom:12px}
+  @media (max-width:520px){ .grid{grid-template-columns:1fr 1fr} .grid > :first-child{grid-column:1 / -1} }
+  .shot{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+  .shotbtn{font:inherit;font-size:14px;font-weight:600;padding:11px 14px;cursor:pointer;border-radius:var(--radius);background:var(--accent);color:#0E1620;border:1px solid var(--accent);position:relative;overflow:hidden}
+  .shotbtn input{position:absolute;inset:0;opacity:0;cursor:pointer}
+  .shotmsg{font-size:13px;color:var(--text-2);flex:1;min-width:180px}
+  .go{font-family:Anton,Impact,sans-serif;text-transform:uppercase;letter-spacing:.045em;font-size:19px;padding:14px 22px;cursor:pointer;width:100%;margin-top:16px;background:var(--accent);color:#0E1620;border:1px solid var(--accent);border-radius:var(--radius)}
+  .go:disabled{opacity:.4;cursor:default}
+  .msg{font-size:14px;color:var(--text-2);min-height:1.2em;margin-top:10px}
+  .note{font-size:13px;color:var(--text-3);line-height:1.55}
+  footer{padding:26px 0 60px;color:var(--text-3);font-size:12.5px;line-height:1.6}
+  footer p{max-width:76ch;margin-bottom:8px}
+  canvas{display:none}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="top-in">
+    <a class="wordmark" href="index.html">Zil<span>ch</span></a>
+    <nav class="sitenav">
+      <a href="index.html">The pitch</a>
+      <a href="find.html">Find a driver</a>
+      <a href="claim.html">Claim profile</a>
+      <a href="board.html">Board</a>
+      <a href="offer.html">Offer check</a>
+      <a href="worst.html" aria-current="page">Worst offers</a>
+      <a href="receipt.html">Receipts</a>
+      <a href="deact.html">Deactivations</a>
+      <a href="paycheck.html">Pay check</a>
+      <a href="account.html">Sign in</a>
+    </nav>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="intro">
+    <span class="eyebrow">Hall of shame &middot; resets every Monday</span>
+    <h1>Worst offer <em>of the week</em>.</h1>
+    <p>The offers the apps hope you don't screenshot. Drivers submit them with proof, and they're ranked by what they actually pay per hour once your car is paid for.</p>
+  </div>
+
+  <div class="card champ" id="champ">
+    <span class="tag" id="champTag">This week's worst</span>
+    <div id="champBody"><p class="empty">Loading&hellip;</p></div>
+  </div>
+
+  <div class="card">
+    <div class="tabs">
+      <button id="tWeek" aria-pressed="true">This week</button>
+      <button id="tAll" aria-pressed="false">All time</button>
+    </div>
+    <div id="list"><p class="none">Loading&hellip;</p></div>
+  </div>
+
+  <div class="card" id="submitCard">
+    <h2>Submit an offer</h2>
+    <p class="sub">A screenshot is required. It's kept private as proof and never shown, because offers can show addresses. Only the numbers go on the board.</p>
+    <div class="shot">
+      <label class="shotbtn">Pick the screenshot<input type="file" id="shotFile" accept="image/*"></label>
+      <span class="shotmsg" id="shotMsg">We'll read the payout, miles and minutes from it. Check them before you submit.</span>
+    </div>
+    <div class="grid2">
+      <div>
+        <label class="fl" for="fApp">App</label>
+        <select id="fApp">
+          <option value="">Pick one</option>
+          <option>DoorDash</option><option>Uber Eats</option><option>Grubhub</option><option>Instacart</option>
+          <option>Uber</option><option>Lyft</option><option>Spark</option><option>Other</option>
+        </select>
+      </div>
+      <div>
+        <label class="fl" for="fArea">Area</label>
+        <select id="fArea">
+          <option value="">Rather not say</option>
+          <option value="minneapolis">Minneapolis</option><option value="stpaul">Saint Paul</option>
+          <option value="hopkins">Hopkins</option><option value="minnetonka">Minnetonka</option>
+          <option value="slp">St. Louis Park</option><option value="edenprairie">Eden Prairie</option>
+          <option value="plymouth">Plymouth</option><option value="waconia">Waconia</option>
+          <option value="other">Somewhere else</option>
+        </select>
+      </div>
+    </div>
+    <div class="grid">
+      <div><label class="fl" for="pay">Payout $</label><input type="number" id="pay" inputmode="decimal" min="0" step="0.25"></div>
+      <div><label class="fl" for="mi">Miles</label><input type="number" id="mi" inputmode="decimal" min="0" step="0.1"></div>
+      <div><label class="fl" for="min">Minutes</label><input type="number" id="min" inputmode="decimal" min="0" step="1"></div>
+    </div>
+    <button class="go" id="submit" disabled>Submit it</button>
+    <p class="msg" id="msg"></p>
+  </div>
+
+  <p class="note">Car cost is one fixed estimate for every entry, so they rank fairly: 25 mpg at $3.00 a gallon plus $0.15 a mile for wear, or $0.27 a mile. Per hour = (payout &minus; car cost) &divide; minutes. Tips the app included in the offer count as payout.</p>
+</div>
+
+<footer class="wrap">
+  <p>Every entry is submitted by a driver with a screenshot on file. Zilch isn't affiliated with any app.</p>
+</footer>
+
+<canvas id="cv" width="1080" height="1080"></canvas>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="auth.js"></script>
+<script src="offer-parse.js"></script>
+<script>
+(function(){
+  "use strict";
+  var $ = function(id){ return document.getElementById(id); };
+  var sb = window.supabase.createClient("https://zlvvtaydmaphdnhvmppj.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpsdnZ0YXlkbWFwaGRuaHZtcHBqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg5NzE3MTEsImV4cCI6MjEwNDU0NzcxMX0.t5ILb0-k3auW1Z3Em-gdR11rHURl5N-SVic9q1YDG7k");
+  zilchAuth.attach(sb, null);
+
+  var AREAS = {minneapolis:"Minneapolis", stpaul:"Saint Paul", hopkins:"Hopkins", minnetonka:"Minnetonka", slp:"St. Louis Park",
+               edenprairie:"Eden Prairie", plymouth:"Plymouth", waconia:"Waconia", other:"Twin Cities"};
+  var COLS = "id,platform,area,payout,miles,minutes,car_cost,net,per_hour,per_mile,created_at";
+  var rows = [], view = "week", shotFile = null;
+
+  function esc(s){ return String(s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+  function usd(v){ v = Number(v); return (v < 0 ? "−$" : "$") + Math.abs(v).toFixed(2); }
+  function weekStart(){
+    var d = new Date(); var day = (d.getDay() + 6) % 7;   // Monday = 0
+    d.setHours(0, 0, 0, 0); d.setDate(d.getDate() - day); return d;
+  }
+  function where(r){ return r.platform + (r.area ? " · " + (AREAS[r.area] || r.area) : ""); }
+  function what(r){ return usd(r.payout) + " for " + Number(r.miles) + " mi, " + Number(r.minutes) + " min"; }
+
+  async function load(){
+    var res = await sb.from("worst_offers").select(COLS).order("per_hour", {ascending: true}).limit(200);
+    if (res.error){ $("list").innerHTML = '<p class="none">Can’t reach the board right now.</p>'; $("champBody").innerHTML = ""; return; }
+    rows = res.data || [];
+    render();
+  }
+
+  function render(){
+    var since = weekStart();
+    var week = rows.filter(function(r){ return new Date(r.created_at) >= since; });
+    var champ = week[0];
+    if (champ){
+      $("champBody").innerHTML =
+        '<div class="big">' + usd(champ.per_hour) + '/hr</div>' +
+        '<p class="what">' + esc(where(champ)) + ': ' + esc(what(champ)) + '</p>' +
+        '<p class="math">' + usd(champ.payout) + ' payout − ' + usd(champ.car_cost) + ' car cost = ' + usd(champ.net) +
+        ' for ' + Number(champ.minutes) + ' minutes of work. That’s ' + usd(champ.per_mile) + ' a mile.</p>' +
+        '<button class="sh" data-share="' + esc(champ.id) + '" style="margin-top:12px;font:inherit;font-size:13px;font-weight:600;padding:8px 12px;cursor:pointer;background:var(--surface);color:var(--text);border:1px solid var(--line);border-radius:3px">Make a share card</button>';
+    } else {
+      $("champBody").innerHTML = '<p class="empty">No entries yet this week. Got a lowball offer on screen? Submit it below and it’s the one to beat.</p>';
+    }
+    var list = view === "week" ? week : rows;
+    if (!list.length){ $("list").innerHTML = '<p class="none">' + (view === "week" ? "Nothing this week yet." : "Nothing yet.") + '</p>'; }
+    else {
+      $("list").innerHTML = list.slice(0, 25).map(function(r, i){
+        return '<div class="row"><span class="rk">' + (i + 1) + '</span>' +
+          '<div><div class="rw">' + esc(where(r)) + '</div><div class="rm">' + esc(what(r)) + ' · ' + usd(r.per_mile) + '/mi</div></div>' +
+          '<div class="rv"><div class="ph">' + usd(r.per_hour) + '/hr</div><button class="sh" data-share="' + esc(r.id) + '">Share</button></div></div>';
+      }).join("");
+    }
+    Array.prototype.forEach.call(document.querySelectorAll("[data-share]"), function(b){
+      b.addEventListener("click", function(){ shareCard(b.getAttribute("data-share")); });
+    });
+  }
+
+  $("tWeek").addEventListener("click", function(){ view = "week"; $("tWeek").setAttribute("aria-pressed","true"); $("tAll").setAttribute("aria-pressed","false"); render(); });
+  $("tAll").addEventListener("click", function(){ view = "all"; $("tAll").setAttribute("aria-pressed","true"); $("tWeek").setAttribute("aria-pressed","false"); render(); });
+
+  /* --- share card --- */
+  function shareCard(id){
+    var r = rows.filter(function(x){ return x.id === id; })[0]; if (!r) return;
+    var cv = $("cv"), c = cv.getContext("2d"), W = 1080, P = 84;
+    c.fillStyle = "#0E1620"; c.fillRect(0, 0, W, W);
+    c.fillStyle = "#E5806A"; c.font = "600 26px 'IBM Plex Mono', monospace";
+    c.fillText("WORST OFFER OF THE WEEK", P, P + 20);
+    c.fillStyle = "#E8EEF3"; c.font = "62px Anton, Impact, sans-serif";
+    c.fillText(r.platform.toUpperCase() + " OFFERED", P, P + 130);
+    c.fillStyle = "#FFB020"; c.font = "150px Anton, Impact, sans-serif";
+    c.fillText(usd(r.payout), P, P + 300);
+    c.fillStyle = "#E8EEF3"; c.font = "62px Anton, Impact, sans-serif";
+    c.fillText("FOR " + Number(r.miles) + " MILES, " + Number(r.minutes) + " MIN", P, P + 390);
+    c.fillStyle = "#A3B4C1"; c.font = "500 36px 'IBM Plex Sans', sans-serif";
+    c.fillText("After gas and wear (" + usd(r.car_cost) + "), the driver nets", P, P + 500);
+    c.fillStyle = "#E5806A"; c.font = "170px Anton, Impact, sans-serif";
+    c.fillText(usd(r.per_hour) + "/HR", P, P + 690);
+    c.fillStyle = "#6F8494"; c.font = "500 24px 'IBM Plex Sans', sans-serif";
+    c.fillText((r.area ? (AREAS[r.area] || r.area) + " · " : "") + "Submitted by a driver with a screenshot. Car cost $0.27/mi.", P, 1000);
+    c.fillStyle = "#FFB020"; c.font = "30px Anton, Impact, sans-serif";
+    var t = "ZILCH", tw = c.measureText(t).width; c.fillText(t, W - P - tw, 956);
+    cv.toBlob(function(b){
+      var f = new File([b], "worst-offer.png", {type: "image/png"});
+      var cap = r.platform + " offered " + usd(r.payout) + " for " + Number(r.miles) + " miles. After gas, that's " + usd(r.per_hour) + "/hr. #WorstOfferOfTheWeek";
+      if (navigator.canShare && navigator.canShare({files: [f]})) navigator.share({files: [f], text: cap}).catch(function(){});
+      else { var a = document.createElement("a"); a.href = URL.createObjectURL(b); a.download = "worst-offer.png"; document.body.appendChild(a); a.click(); a.remove(); }
+    }, "image/png");
+  }
+
+  /* --- submit --- */
+  function ready(){
+    var ok = shotFile && $("fApp").value && +$("pay").value >= 0 && $("pay").value !== "" && +$("mi").value > 0 && +$("min").value > 0;
+    $("submit").disabled = !ok;
+  }
+  ["fApp","pay","mi","min"].forEach(function(k){ $(k).addEventListener("input", function(){ $(k).classList.remove("filled"); ready(); }); $(k).addEventListener("change", ready); });
+
+  // Prefill from the offer check ("Submit to Worst Offer").
+  var qs = new URLSearchParams(location.search);
+  ["pay","mi","min"].forEach(function(k){ var v = parseFloat(qs.get(k)); if (isFinite(v)) $(k).value = v; });
+
+  var ocr = null;
+  function loadScript(src){ return new Promise(function(ok, bad){ var s = document.createElement("script"); s.src = src; s.onload = ok; s.onerror = bad; document.head.appendChild(s); }); }
+  $("shotFile").addEventListener("change", async function(e){
+    var f = e.target.files[0]; e.target.value = "";
+    if (!f || !/^image\//.test(f.type)) return;
+    shotFile = f; ready();
+    var m = $("shotMsg"); m.textContent = "Got it. Reading the numbers…";
+    try {
+      if (!window.Tesseract) await loadScript("https://cdn.jsdelivr.net/npm/tesseract.js@7.0.0/dist/tesseract.min.js");
+      if (!ocr) ocr = await window.Tesseract.createWorker("eng");
+      var res = await ocr.recognize(f);
+      var got = window.parseOffer(res.data.text, new Date());
+      [["pay", got.pay], ["mi", got.miles], ["min", got.minutes]].forEach(function(x){
+        if (x[1] != null && $(x[0]).value === ""){ $(x[0]).value = x[1]; $(x[0]).classList.add("filled"); }
+      });
+      var t = res.data.text.toLowerCase();
+      if (!$("fApp").value){
+        var app = /doordash|dasher/.test(t) ? "DoorDash" : /uber\s*eats/.test(t) ? "Uber Eats" : /grubhub/.test(t) ? "Grubhub" : /instacart|shopper/.test(t) ? "Instacart" : /lyft/.test(t) ? "Lyft" : /spark/.test(t) ? "Spark" : /uber/.test(t) ? "Uber" : "";
+        if (app) $("fApp").value = app;
+      }
+      m.textContent = "Screenshot attached. Check the highlighted numbers" + ($("fApp").value ? "" : " and pick the app") + ", then submit.";
+    } catch(err){
+      m.textContent = "Screenshot attached. Couldn’t read it automatically, so type the numbers in.";
+    }
+    ready();
+  });
+
+  $("submit").addEventListener("click", async function(){
+    var b = $("submit"), m = $("msg");
+    b.disabled = true; m.textContent = "Uploading…";
+    var ext = ((shotFile.type.split("/")[1] || "png").replace("jpeg", "jpg").replace(/[^a-z0-9]/g, "") || "png");
+    if (["jpg","png","webp","heic"].indexOf(ext) < 0) ext = "png";
+    var rnd = new Uint8Array(8); crypto.getRandomValues(rnd);
+    var path = "w-" + Date.now().toString(36) + "-" + Array.prototype.map.call(rnd, function(x){ return ("0" + x.toString(16)).slice(-2); }).join("") + "." + ext;
+    var up = await sb.storage.from("offers").upload(path, shotFile, {upsert: false, contentType: shotFile.type || "image/png"});
+    if (up.error){ m.textContent = "The screenshot didn’t upload. Try again."; b.disabled = false; return; }
+    var res = await sb.rpc("submit_worst_offer", {p: {
+      platform: $("fApp").value, area: $("fArea").value || null,
+      payout: +$("pay").value, miles: +$("mi").value, minutes: +$("min").value, shot_path: path
+    }});
+    if (res.error){ m.textContent = "That didn’t save. Check the numbers and try again."; b.disabled = false; return; }
+    m.textContent = "Submitted. It’s on the board.";
+    shotFile = null; ["pay","mi","min"].forEach(function(k){ $(k).value = ""; $(k).classList.remove("filled"); });
+    $("shotMsg").textContent = "Got another one? Pick the next screenshot.";
+    view = "week"; $("tWeek").setAttribute("aria-pressed","true"); $("tAll").setAttribute("aria-pressed","false");
+    load();
+  });
+
+  load();
+})();
+</script>
+<script src="pwa.js"></script>
+</body>
+</html>

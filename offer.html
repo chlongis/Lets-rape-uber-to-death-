@@ -180,6 +180,7 @@
       <a href="claim.html">Claim profile</a>
       <a href="board.html">Board</a>
       <a href="offer.html" aria-current="page">Offer check</a>
+      <a href="worst.html">Worst offers</a>
       <a href="receipt.html">Receipts</a>
       <a href="deact.html">Deactivations</a>
       <a href="paycheck.html">Pay check</a>
@@ -233,6 +234,7 @@
   <div class="verdict idle" id="verdict" aria-live="polite">
     <div class="vword" id="vWord">Waiting</div>
     <p class="vwhy" id="vWhy">Enter the payout, miles and minutes.</p>
+    <a id="toWorst" href="worst.html" hidden style="display:inline-block;margin-top:10px;font-size:13.5px;font-weight:600;color:var(--warn)">Insulting? Submit it to Worst Offer of the Week &rarr;</a>
     <div class="nums">
       <div class="num"><div class="v" id="nNet">—</div><div class="k">you actually keep</div></div>
       <div class="num"><div class="v" id="nHr">—</div><div class="k">per hour, after costs</div></div>
@@ -318,6 +320,7 @@
       $("vWhy").textContent = isFinite(cpm) ? "Enter the payout, miles and minutes." : "Set your MPG and gas price first.";
       ["nNet","nHr","nMi","nCost"].forEach(function(k){ $(k).textContent = "—"; });
       $("bTook").disabled = $("bPassed").disabled = true;
+      $("toWorst").hidden = true;
       return;
     }
 
@@ -354,6 +357,8 @@
     $("nMi").textContent = isFinite(perMi) ? money(perMi) : "—";
     $("nCost").textContent = money(cost);
     $("bTook").disabled = $("bPassed").disabled = false;
+    $("toWorst").hidden = cls !== "skip";
+    $("toWorst").href = "worst.html?pay=" + pay + "&mi=" + mi + "&min=" + min;
     current = {pay:pay, cost:cost, net:net, min:totalMin, mi:totalMi, verdict:cls, t:Date.now()};
   }
 
