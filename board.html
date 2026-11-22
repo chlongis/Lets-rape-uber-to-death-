@@ -532,7 +532,8 @@
     bar.hidden = mode !== "drive";
     if (payoutState === "ready"){
       bar.className = "payout on";
-      bar.innerHTML = "<b>Card payouts on.</b> Posters can pay you by card. Money goes straight to your Stripe account.";
+      bar.innerHTML = "<span><b>Card payouts on.</b> Posters can pay you by card. Money goes straight to your Stripe account.</span>" +
+        '<a class="sbtn" href="https://dashboard.stripe.com/" target="_blank" rel="noopener">Your Stripe dashboard</a>';
       return;
     }
     bar.className = "payout";
